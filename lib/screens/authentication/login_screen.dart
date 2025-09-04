@@ -77,30 +77,30 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void validateAndSubmit() async {
 
-if(isDemo){
-  if(isAdmin == true){
-    context.read<AuthBloc>().add(GetEmail(email: "admin@gmail.com"));
-    context.read<AuthBloc>().add(GetPassword(password:"123456"));
-  }else if(isClient == true){
-    context.read<AuthBloc>().add(GetEmail(email: "client@gmail.com"));
-    context.read<AuthBloc>().add(GetPassword(password: "123456"));
-  }else if(isMember == true){
-    context.read<AuthBloc>().add(GetEmail(email: "member@gmail.com"));
-    context.read<AuthBloc>().add(GetPassword(password: "123456"));
-  }
-}else{
-  if(isAdmin == true){
+// if(isDemo){
+//   if(isAdmin == true){
+//     context.read<AuthBloc>().add(GetEmail(email: "admin@gmail.com"));
+//     context.read<AuthBloc>().add(GetPassword(password:"123456"));
+//   }else if(isClient == true){
+//     context.read<AuthBloc>().add(GetEmail(email: "client@gmail.com"));
+//     context.read<AuthBloc>().add(GetPassword(password: "123456"));
+//   }else if(isMember == true){
+//     context.read<AuthBloc>().add(GetEmail(email: "member@gmail.com"));
+//     context.read<AuthBloc>().add(GetPassword(password: "123456"));
+//   }
+// }else{
+//   if(isAdmin == true){
 
-    context.read<AuthBloc>().add(GetEmail(email: "admin@gmail.com"));
-    context.read<AuthBloc>().add(GetPassword(password:"12345678"));
-  }else if(isClient == true){
-    context.read<AuthBloc>().add(GetEmail(email: "infinitie.parasgiri@gmail.com"));
-    context.read<AuthBloc>().add(GetPassword(password: "12345678"));
-  }else if(isMember == true){
-    context.read<AuthBloc>().add(GetEmail(email: "infinitietechnologies09@gmail.com"));
-    context.read<AuthBloc>().add(GetPassword(password: "12345678"));
-  }
-}
+//     context.read<AuthBloc>().add(GetEmail(email: "admin@gmail.com"));
+//     context.read<AuthBloc>().add(GetPassword(password:"12345678"));
+//   }else if(isClient == true){
+//     context.read<AuthBloc>().add(GetEmail(email: "infinitie.parasgiri@gmail.com"));
+//     context.read<AuthBloc>().add(GetPassword(password: "12345678"));
+//   }else if(isMember == true){
+//     context.read<AuthBloc>().add(GetEmail(email: "infinitietechnologies09@gmail.com"));
+//     context.read<AuthBloc>().add(GetPassword(password: "12345678"));
+//   }
+// }
     if (emailController.text.isNotEmpty &&
         emailController.text != "" &&
         passwordController.text != "" &&

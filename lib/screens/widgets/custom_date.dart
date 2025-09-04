@@ -87,7 +87,7 @@ class DatePickerWidget extends StatelessWidget {
               textAlign: TextAlign.start, // ✅ Keeps text aligned to the left
               decoration: InputDecoration(
 
-                  hintText: (dateController == null || dateController.text.isEmpty || dateController.text.trim() == "null")
+                  hintText: (dateController.text.isEmpty || dateController.text.trim() == "null")
                       ? AppLocalizations.of(context)!.selectdate
                       : dateController.text,
 

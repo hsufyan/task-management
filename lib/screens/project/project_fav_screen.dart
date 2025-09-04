@@ -360,6 +360,8 @@ class _FavouriteScreenState extends State<FavouriteScreen> with TickerProviderSt
                     )
                         : const NoPermission()),
               ),
+   
+   
     ]),
     )));
   }

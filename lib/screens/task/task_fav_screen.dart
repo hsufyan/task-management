@@ -263,7 +263,7 @@ class _TaskFavouriteScreenState extends State<TaskFavouriteScreen>
                                         clientId: [],
                                         userId: [],
                                         statusId: [],
-                                        priorityId: [],
+                                     //   priorityId: [],
                                         fromDate: "",
                                         toDate: "",
                                         isFav: 1));

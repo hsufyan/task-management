@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:hive/hive.dart';
+import 'package:taskify/config/strings.dart';
 
 import '../../../api_helper/api_base_helper.dart';
 import '../../../config/end_points.dart';
@@ -9,11 +11,11 @@ class TaskRepo {
   Future<Map<String, dynamic>> createTask(
       {required String title,
       required int statusId,
-      required int priorityId,
+      // required int priorityId,
       required String startDate,
       required String dueDate,
       required String desc,
-      required int project,
+      // required int project,
       required String note,
       required List<int> userId,
       String? search}) async {
@@ -21,11 +23,11 @@ class TaskRepo {
       Map<String, dynamic> body = {
         "title": title,
         "status_id": statusId,
-        "priority_id": priorityId,
+        //  "priority_id": priorityId,
         "start_date": startDate,
         "due_date": dueDate,
         "description": desc,
-        "project": project,
+        //  "project": project,
         "note": note,
         "user_id": userId,
       };
@@ -38,7 +40,7 @@ class TaskRepo {
         useAuthToken: true,
         body: body,
       );
-      print("sedfghjnkm${response['data']}");
+      print("task working ${response['data']}");
       // rows = response['data'] as List<dynamic>;
       // for (var row in rows) {
       //   task.add(CreateTaskModel.fromJson(row as Map<String, dynamic>));
@@ -50,115 +52,124 @@ class TaskRepo {
     }
   }
 
-  Future<Map<String, dynamic>> getTask(
-      {int? offset,
-      int? limit,
-      required bool token,
-      String? search,
-      List<int>? userId,
-      List<int>? projectId,
-      List<int>? clientId,
-      List<int>? priorityId,
-      List<int>? statusId,
-      String? toDate,
-      String? fromDate,
-      int? id,
-      bool? subtask,
-      int? isFav}) async {
-    try {
-      Map<String, dynamic> body = {};
+// Store user_id in Hive
+  static Future<void> setUserId(int userId) async {
+    Box box = await Hive.openBox(userBox);
+    await box.put('user_id', userId);
+  }
 
-      print("iD $fromDate");
-      print("iD $toDate");
-      print("iD $statusId");
-      print("iD $clientId");
-      print("iD $projectId");
-      print("iD $userId");
-      print("iD priorityId $priorityId");
-      print("iD $search");
-      print("iD $token");
-      print("iD $subtask");
-      print("iD drgty $id");
-      // Adding data to the body only if it's not null
-      if (subtask == true && id != null) {
-        body["task_parent_id"] = id;
-      }
+// Fetch tasks (with user_id from Hive if not explicitly passed)
+ // ===================== SET ROLE =====================
+static Future<void> setRole(String role) async {
+  Box box = await Hive.openBox(userBox);
+  await box.put('role', role);
+  print("[INFO] Role saved: $role");
+}
 
-      if (search?.isNotEmpty ?? false) {
-        body["search"] = search;
+// ===================== GET TASK =====================
+Future<Map<String, dynamic>> getTask({
+  int? offset,
+  int? limit,
+  required bool token,
+  String? search,
+  List<int>? userId, // optional override
+  List<int>? projectId,
+  List<int>? clientId,
+  List<int>? priorityId,
+  List<int>? statusId,
+  String? toDate,
+  String? fromDate,
+  int? id,
+  bool? subtask,
+  int? isFav,
+}) async {
+  try {
+    print("====== ENTERING getTask ======");
+
+    // 🔹 Fetch stored user_id if not provided
+    if (userId == null || userId.isEmpty) {
+      Box box = await Hive.openBox(userBox);
+      int? storedUserId = box.get('user_id');
+      if (storedUserId != null) {
+        userId = [storedUserId];
+        print("[INFO] Using stored user_id: $storedUserId");
       }
-      if (limit != null) {
-        body["limit"] = limit;
-      }
-      if (isFav != null) {
-        body["is_favorites"] = isFav;
-      }
-      if (offset != null) {
-        body["offset"] = offset;
-      }
+    }
+
+    // 🔹 Fetch role from Hive
+    Box box = await Hive.openBox(userBox);
+    String role = box.get('role', defaultValue: "member");
+    print("[INFO] Current role: $role");
+
+    // ===================== BODY (only for member) =====================
+    Map<String, dynamic> body = {};
+    if (role == "member") {
       if (userId != null && userId.isNotEmpty) {
         body["user_ids[]"] = userId;
       }
-      if (clientId != null && clientId.isNotEmpty) {
-        body["client_ids[]"] = clientId;
-      }
-      if (projectId != null && projectId.isNotEmpty) {
-        body["project_ids[]"] = projectId;
-      }
-      if (statusId != null && statusId.isNotEmpty) {
-        body["status_ids[]"] = statusId;
-      }
-      if (priorityId != null && priorityId.isNotEmpty) {
-        body["priority_ids[]"] = priorityId;
-      }
-      if (toDate?.isNotEmpty ?? false) {
-        body["task_end_date_to"] = toDate;
-      }
-      if (fromDate?.isNotEmpty ?? false) {
-        body["task_start_date_from"] = fromDate;
-      }
-      print("BODY TASK $body");
-      // Making the API request with the parameters that are available
-      Map<String, dynamic> response = {};
+    }
+
+    print(">>> FINAL BODY BEFORE API CALL: $body");
+
+    // ===================== API CALL =====================
+    Map<String, dynamic> response;
+
+    if (role == "member") {
+      // ----- MEMBER -----
       if (subtask == true && id != null) {
-
-          body["task_parent_id"] = id;
-
-        print("fsrjn kgfmvc,  $subtask}");
-        // Handle case where there's no specific ID
         response = await ApiBaseHelper.getApi(
           url: getAllTaskUrl,
-          useAuthToken: true,
+          useAuthToken: token,
           params: body,
         );
       } else if (id != null) {
-        print("fsrjn,  $id}");
-          body["id"] = id;
-
         response = await ApiBaseHelper.getApi(
-          url: "$getAllTaskUrl/$id",
-          useAuthToken: true,
+          url: "$getAllTaskUrl?user_ids[]=$id",
+          useAuthToken: token,
           params: body,
         );
       } else {
-
-          body["id"] = id;
-
-        // Handle case where there's no specific ID
         response = await ApiBaseHelper.getApi(
           url: getAllTaskUrl,
-          useAuthToken: true,
+          useAuthToken: token,
           params: body,
         );
       }
-
-      print("==body $body=====response $response");
-      return response;
-    } catch (error) {
-      print("=======Error ${error.toString()}");
-      throw Exception('Error occurred');
+    } else {
+      // ----- ADMIN -----
+      if (subtask == true && id != null) {
+        response = await ApiBaseHelper.getApi(
+          url: getAllTaskUrl,
+          useAuthToken: token,
+          params: {},
+        );
+      } else if (id != null) {
+        response = await ApiBaseHelper.getApi(
+          url: "$getAllTaskUrl?user_ids[]=$id",
+          useAuthToken: token,
+          params: {},
+        );
+      } else {
+        response = await ApiBaseHelper.getApi(
+          url: getAllTaskUrl,
+          useAuthToken: token,
+          params: {},
+        );
+      }
     }
+
+    if (response['error'] == true) {
+      throw Exception('Server error: ${response['message']}');
+    }
+
+    print("====== EXITING getTask SUCCESSFULLY ======");
+    return response;
+  } catch (error, stack) {
+    print("!!! ERROR in getTask: $error");
+    print("STACKTRACE: $stack");
+    throw Exception('Failed to fetch tasks: $error');
   }
+}
 
   Future<Map<String, dynamic>> getTasksFav({
     int? limit,

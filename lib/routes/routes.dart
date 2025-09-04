@@ -213,9 +213,13 @@ final router = GoRouter(
           final Map<String, dynamic> data = state.extra as Map<String, dynamic>;
           final bool isCreate = data['isCreate'] as bool? ?? true;
           final int projectId = data['projectId'] as int? ?? 0;
-          final Milestone? milestone = data['milestone'] as Milestone?; // Extract milestone
+          final Milestone? milestone =
+              data['milestone'] as Milestone?; // Extract milestone
 
-          return MilestoneCreateEditScreen(isCreate: isCreate,milestoneModel: milestone!,projectId:projectId);
+          return MilestoneCreateEditScreen(
+              isCreate: isCreate,
+              milestoneModel: milestone!,
+              projectId: projectId);
         }),
     GoRoute(
         name: 'discussionTabsScreen',
@@ -224,7 +228,10 @@ final router = GoRouter(
           final Map<String, dynamic> data = state.extra as Map<String, dynamic>;
           final bool isDetail = data['isDetail'] as bool? ?? true;
           final int id = data['id'] as int? ?? 0;
-          return DiscussionTabs(fromDetail: isDetail,id: id,);
+          return DiscussionTabs(
+            fromDetail: isDetail,
+            id: id,
+          );
         }),
     GoRoute(
         name: 'taskdiscussionTabsScreen',
@@ -233,7 +240,10 @@ final router = GoRouter(
           final Map<String, dynamic> data = state.extra as Map<String, dynamic>;
           final bool isDetail = data['isDetail'] as bool? ?? true;
           final int id = data['id'] as int? ?? 0;
-          return TaskDiscussionTabs(fromDetail: isDetail,id: id,);
+          return TaskDiscussionTabs(
+            fromDetail: isDetail,
+            id: id,
+          );
         }),
     GoRoute(
         name: 'privacyPolicyScreen',
@@ -342,7 +352,11 @@ final router = GoRouter(
           final int id = data['id'] as int? ?? 0;
           final bool fromNoti = data['fromNoti'] as bool? ?? false;
           final String from = data['from'] as String? ?? "";
-          return ProjectDetails(id: id, fromNoti: fromNoti,from: from,);
+          return ProjectDetails(
+            id: id,
+            fromNoti: fromNoti,
+            from: from,
+          );
         }),
 
     GoRoute(
@@ -601,16 +615,16 @@ final router = GoRouter(
       builder: (context, state) => const MediaStorageScreen(),
     ),
     GoRoute(
-      name: 'permissionsScreen',
-      path: '/permissions',
-      builder: (context, state) {
-        final Map<String, dynamic> data = state.extra as Map<String, dynamic>;
-        final int roleId = data['roleId'] as int? ?? 0;
-        final String roleName = data['roleName'] as String? ?? "";
-        final bool isCreate = data['isCreate'] as bool? ?? true;
-        return PermissionsToRole(roleId: roleId,roleName:roleName,isCreate:isCreate);
-      }
-    ),
+        name: 'permissionsScreen',
+        path: '/permissions',
+        builder: (context, state) {
+          final Map<String, dynamic> data = state.extra as Map<String, dynamic>;
+          final int roleId = data['roleId'] as int? ?? 0;
+          final String roleName = data['roleName'] as String? ?? "";
+          final bool isCreate = data['isCreate'] as bool? ?? true;
+          return PermissionsToRole(
+              roleId: roleId, roleName: roleName, isCreate: isCreate);
+        }),
     GoRoute(
         name: 'createmeetingScreen',
         path: '/createmeeting',
@@ -621,7 +635,6 @@ final router = GoRouter(
           return CreateMeetingScreen(
             isCreate: isCreate,
             id: id,
-
           );
         }),
     GoRoute(

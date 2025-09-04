@@ -7,11 +7,11 @@ import 'package:taskify/bloc/setting/settings_bloc.dart';
 
 
 const String appName = 'Taskify!';
-const String baseUrl = 'http://192.168.1.60:8000/api/';
+const String baseUrl = 'http://192.168.1.22:8000/api/';
 
+// /com.example.taskify
 
-
-const String packageName = 'com.example.taskify';
+const String packageName = 'com.check.taskiiify.task.example.task';
 String defaultLanguage = 'en';
 String defaultCountryCode = '+91';
 String defaultCountry = 'IN';
@@ -159,9 +159,7 @@ DateTime parseDateStringFromApi(String dateString) {
     // Create a new DateTime with the same year, month, and day but no time
     return DateTime(parsedDate.year, parsedDate.month, parsedDate.day);
   } catch (e) {
-
     // Handle error if the date is invalid
-
     // Return the current date with time set to midnight (no time component)
     return DateTime.now().toLocal().subtract(Duration(
         hours: DateTime.now().hour,
@@ -244,6 +242,7 @@ String getOrdinalSuffix(int number) {
       return "ᵗʰ"; // All others -> ᵗʰ
   }
 }
+
 Future<void> requestForPermission() async {
   await Permission.microphone.request();
 }
@@ -266,6 +265,7 @@ void listenForPermissions() async {
       break;
   }
 }
+
 Color hexToColor(String hexColor) {
   hexColor = hexColor.toUpperCase().replaceAll("#", "").replaceAll("0X", "");
   if (hexColor.length == 6) {
@@ -274,6 +274,3 @@ Color hexToColor(String hexColor) {
   print("hgffdrd ${Color(int.parse("0x$hexColor"))}");
   return Color(int.parse("0x$hexColor")); // Ensure proper hex format
 }
-
-
-

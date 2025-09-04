@@ -1,23 +1,22 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:taskify/firebase_options.dart';
 import 'package:taskify/screens/my_app.dart';
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
-import 'app/app.dart';
 import 'bloc/theme/theme_bloc.dart';
 import 'bloc/theme/theme_event.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
  await Firebase.initializeApp(
   options: DefaultFirebaseOptions.currentPlatform,
 );
 // 2️⃣ Hive initialization (this is the fix!)
-  await Hive.initFlutter();
+  
   bool isDarkTheme = false;
 
   runApp(

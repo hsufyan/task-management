@@ -117,7 +117,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
             MaterialPageRoute(
               builder: (context) => const DashBoard(initialIndex: 2),
             ),
-                (route) {
+            (route) {
               return route is! MaterialPageRoute ||
                   route.settings.name != 'taskdetail';
             },
@@ -131,7 +131,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
             MaterialPageRoute(
               builder: (context) => const DashBoard(initialIndex: 2),
             ),
-                (route) {
+            (route) {
               return route is! MaterialPageRoute ||
                   route.settings.name != 'taskdetail';
             },
@@ -167,100 +167,100 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               context.read<PermissionsBloc>().isdeleteTask == true ||
                       context.read<PermissionsBloc>().iseditTask == true
                   ? detailMenu(
-                  isDiscuss:true,
-                     isEdit:  context.read<PermissionsBloc>().iseditTask,
-                     isDelete:  context.read<PermissionsBloc>().isdeleteTask,
+                      isDiscuss: true,
+                      isEdit: context.read<PermissionsBloc>().iseditTask,
+                      isDelete: context.read<PermissionsBloc>().isdeleteTask,
                       key: _key,
                       context: context,
                       onpressEdit: () {
-                      _key.currentState?.toggle();
-                      List<String> username = [];
-                      for (var names in users!) {
-                        username.add(names.firstName!);
-                      }
-                      List<int>? ids = [];
-                      for (var i in users!) {
-                        ids.add(i.id!);
-                      }
-                      router.push(
-                        '/createtask',
-                        extra: {
-                          "id": widget.id,
-                          "isCreate": false,
-                          "fromDetail": true,
-                          "title": title,
-                          "users": username,
-                          "desc": description,
-                          "start": startDate,
-                          "end": dueDate,
-                          // "user":task.users,
-                          'priority': priority,
-                          // or true, depending on your needs
-                          'priorityId': priorityId,
-                          "usersid": ids,
-                          // or true, depending on your needs
-                          'statusId': statusId,
-                          // or true, depending on your needs
-                          'note': note,
-                          // or true, depending on your needs
-                          'project': project,
-                          "userList": users,
-                          // "users": username,
-                          // or true, depending on your needs
-                          'projectId': projectId,
-                          // or true, depending on your needs
-                          'status': status,
-                          // or true, depending on your needs
-                          'req': <CreateTaskModel>[],
-                          // your list of LeaveRequests
-                        },
-                      );
-                      // Navigator.pop(context);
-                    },
-                  onpressDelete:  () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  10.r), // Set the desired radius here
-                            ),
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .alertBoxBackGroundColor,
-                            title: Text(
-                              AppLocalizations.of(context)!.confirmDelete,
-                            ),
-                            content: Text(
-                              AppLocalizations.of(context)!.areyousure,
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  _onDeleteTask(widget.id);
-                                },
-                                child: const Text('Delete'),
+                        _key.currentState?.toggle();
+                        List<String> username = [];
+                        for (var names in users!) {
+                          username.add(names.firstName!);
+                        }
+                        List<int>? ids = [];
+                        for (var i in users!) {
+                          ids.add(i.id!);
+                        }
+                        router.push(
+                          '/createtask',
+                          extra: {
+                            "id": widget.id,
+                            "isCreate": false,
+                            "fromDetail": true,
+                            "title": title,
+                            "users": username,
+                            "desc": description,
+                            "start": startDate,
+                            "end": dueDate,
+                            // "user":task.users,
+                            'priority': priority,
+                            // or true, depending on your needs
+                            'priorityId': priorityId,
+                            "usersid": ids,
+                            // or true, depending on your needs
+                            'statusId': statusId,
+                            // or true, depending on your needs
+                            'note': note,
+                            // or true, depending on your needs
+                            'project': project,
+                            "userList": users,
+                            // "users": username,
+                            // or true, depending on your needs
+                            'projectId': projectId,
+                            // or true, depending on your needs
+                            'status': status,
+                            // or true, depending on your needs
+                            'req': <CreateTaskModel>[],
+                            // your list of LeaveRequests
+                          },
+                        );
+                        // Navigator.pop(context);
+                      },
+                      onpressDelete: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    10.r), // Set the desired radius here
                               ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(false); // Cancel deletion
-                                },
-                                child: const Text('Cancel'),
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .alertBoxBackGroundColor,
+                              title: Text(
+                                AppLocalizations.of(context)!.confirmDelete,
                               ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-              onpressdiscuss: (){
-                _key.currentState?.toggle();
-                router.push(
-                  "/taskdiscussionTabs",
-                  extra: {"isDetail": true, "id": widget.id},
-                );
-              })
+                              content: Text(
+                                AppLocalizations.of(context)!.areyousure,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    _onDeleteTask(widget.id);
+                                  },
+                                  child: const Text('Delete'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pop(false); // Cancel deletion
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      onpressdiscuss: () {
+                        _key.currentState?.toggle();
+                        router.push(
+                          "/taskdiscussionTabs",
+                          extra: {"isDetail": true, "id": widget.id},
+                        );
+                      })
                   : SizedBox.shrink(),
           body: SideBar(
               context: context,
@@ -427,8 +427,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                                         : SizedBox.shrink(),
                                     clients != null && clients!.isNotEmpty
                                         ? SizedBox(
-                                      height: 20.h,
-                                    )
+                                            height: 20.h,
+                                          )
                                         : SizedBox(),
                                     clients != null && clients!.isNotEmpty
                                         ? Padding(
@@ -530,11 +530,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         // color: Colors.red,
         // width: 300.w,
         child: BackArrow(
-          onTap: (){
-            if(widget.from == "subtask") {
-              BlocProvider.of<TaskBloc>(context).add(AllTaskListOnTask(id: widget.id));
+          onTap: () {
+            if (widget.from == "subtask") {
+              BlocProvider.of<TaskBloc>(context)
+                  .add(AllTaskListOnTask(id: widget.id));
               router.pop();
-            }else if(widget.from == "dashboard"){
+            } else if (widget.from == "dashboard") {
               BlocProvider.of<TaskBloc>(context).add(AllTaskListOnTask());
               router.pop();
             }
@@ -569,8 +570,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               height: 10.h,
             ),
             ExpandableHtmlWidget(
-              text:description ?? "",
-             context: context,
+              text: description ?? "",
+              context: context,
               width: 290.w,
             ),
             SizedBox(

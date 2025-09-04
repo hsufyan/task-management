@@ -9,11 +9,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:taskify/bloc/notes/notes_bloc.dart';
 import 'package:taskify/bloc/permissions/permissions_bloc.dart';
 import 'package:taskify/bloc/auth/auth_bloc.dart';
-import 'package:taskify/bloc/theme/theme_event.dart';
 import 'package:taskify/bloc/user/user_bloc.dart';
 import 'package:taskify/routes/routes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:taskify/screens/widgets/firebase_services.dart';
 import '../bloc/client_id/clientid_bloc.dart';
 import '../bloc/clients/client_event.dart';
 import '../bloc/income_expense/income_expense_bloc.dart';
@@ -71,7 +69,6 @@ import '../bloc/theme/theme_state.dart';
 import '../bloc/user_profile/user_profile_bloc.dart';
 import '../bloc/work_anniveresary/work_anniversary_bloc.dart';
 import '../bloc/workspace/workspace_event.dart';
-import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -84,9 +81,12 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-// final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class _MyAppState extends State<MyApp> {
+
+  bool initialized = false;
+  late final bool isDarkTheme;
+
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   String? fcmToken;
@@ -96,6 +96,12 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _initializeNotification();
+    ThemeBloc.loadTheme().then((value) {
+    setState(() {
+      isDarkTheme = value;
+      initialized = true;
+    });
+  });
   }
 
   Future<void> _initializeNotification() async {
@@ -109,13 +115,13 @@ class _MyAppState extends State<MyApp> {
     return FutureBuilder<bool>(
       future: ThemeBloc.loadTheme(), // Load theme from Hive asynchronously
       builder: (context, snapshot) {
-        final isDarkTheme = snapshot.data ?? false;
+      //  final isDarkTheme = snapshot.data ?? false;
         return MultiProvider(
             providers: [
               BlocProvider(
                 create: (context) {
                   final themeBloc = ThemeBloc();
-                  themeBloc.add(InitialThemeEvent(isDarkTheme));
+                //  themeBloc.add(InitialThemeEvent(isDarkTheme));
                   return themeBloc;
                 },
               ),
@@ -209,98 +215,100 @@ class _MyAppState extends State<MyApp> {
                         onTap: () {
                           FocusManager.instance.primaryFocus?.unfocus();
                         },
-                        child: MaterialApp.router(
-                          routerConfig: router,
-                          locale: languageState.locale,
-                          supportedLocales: const [
-                            Locale("af"),
-                            Locale("am"),
-                            Locale("ar"),
-                            Locale("az"),
-                            Locale("be"),
-                            Locale("bg"),
-                            Locale("bn"),
-                            Locale("bs"),
-                            Locale("ca"),
-                            Locale("cs"),
-                            Locale("da"),
-                            Locale("de"),
-                            Locale("el"),
-                            Locale("en"),
-                            Locale("es"),
-                            Locale("et"),
-                            Locale("fa"),
-                            Locale("fi"),
-                            Locale("fr"),
-                            Locale("gl"),
-                            Locale("ha"),
-                            Locale("he"),
-                            Locale("hi"),
-                            Locale("hr"),
-                            Locale("hu"),
-                            Locale("hy"),
-                            Locale("id"),
-                            Locale("is"),
-                            Locale("it"),
-                            Locale("ja"),
-                            Locale("ka"),
-                            Locale("kk"),
-                            Locale("km"),
-                            Locale("ko"),
-                            Locale("ku"),
-                            Locale("ky"),
-                            Locale("lt"),
-                            Locale("lv"),
-                            Locale("mk"),
-                            Locale("ml"),
-                            Locale("mn"),
-                            Locale("ms"),
-                            Locale("nb"),
-                            Locale("nl"),
-                            Locale("nn"),
-                            Locale("no"),
-                            Locale("pl"),
-                            Locale("ps"),
-                            Locale("pt"),
-                            Locale("ro"),
-                            Locale("ru"),
-                            Locale("sd"),
-                            Locale("sk"),
-                            Locale("sl"),
-                            Locale("so"),
-                            Locale("sq"),
-                            Locale("sr"),
-                            Locale("sv"),
-                            Locale("ta"),
-                            Locale("tg"),
-                            Locale("th"),
-                            Locale("tk"),
-                            Locale("tr"),
-                            Locale("tt"),
-                            Locale("uk"),
-                            Locale("ug"),
-                            Locale("ur"),
-                            Locale("uz"),
-                            Locale("vi"),
-                            Locale("zh")
-                            // Locale('en'),
-                            // Locale('hi'),
-                            // Locale('ar'),
-                            // Locale('ko'),
-                            // Locale('pt'),
-                            // Locale('vi'),
-                          ],
-                          localizationsDelegates: [
-                            AppLocalizations.delegate,
-                            CountryLocalizations.delegate,
-                            GlobalMaterialLocalizations.delegate,
-                            GlobalWidgetsLocalizations.delegate,
-                            GlobalCupertinoLocalizations.delegate,
-                          ],
-                          debugShowCheckedModeBanner: false,
-                          theme: themeState is LightThemeState
-                              ? ThemeData.light()
-                              : ThemeData.dark(),
+                        child: SafeArea(
+                          child: MaterialApp.router(
+                            routerConfig: router,
+                            locale: languageState.locale,
+                            supportedLocales: const [
+                              Locale("af"),
+                              Locale("am"),
+                              Locale("ar"),
+                              Locale("az"),
+                              Locale("be"),
+                              Locale("bg"),
+                              Locale("bn"),
+                              Locale("bs"),
+                              Locale("ca"),
+                              Locale("cs"),
+                              Locale("da"),
+                              Locale("de"),
+                              Locale("el"),
+                              Locale("en"),
+                              Locale("es"),
+                              Locale("et"),
+                              Locale("fa"),
+                              Locale("fi"),
+                              Locale("fr"),
+                              Locale("gl"),
+                              Locale("ha"),
+                              Locale("he"),
+                              Locale("hi"),
+                              Locale("hr"),
+                              Locale("hu"),
+                              Locale("hy"),
+                              Locale("id"),
+                              Locale("is"),
+                              Locale("it"),
+                              Locale("ja"),
+                              Locale("ka"),
+                              Locale("kk"),
+                              Locale("km"),
+                              Locale("ko"),
+                              Locale("ku"),
+                              Locale("ky"),
+                              Locale("lt"),
+                              Locale("lv"),
+                              Locale("mk"),
+                              Locale("ml"),
+                              Locale("mn"),
+                              Locale("ms"),
+                              Locale("nb"),
+                              Locale("nl"),
+                              Locale("nn"),
+                              Locale("no"),
+                              Locale("pl"),
+                              Locale("ps"),
+                              Locale("pt"),
+                              Locale("ro"),
+                              Locale("ru"),
+                              Locale("sd"),
+                              Locale("sk"),
+                              Locale("sl"),
+                              Locale("so"),
+                              Locale("sq"),
+                              Locale("sr"),
+                              Locale("sv"),
+                              Locale("ta"),
+                              Locale("tg"),
+                              Locale("th"),
+                              Locale("tk"),
+                              Locale("tr"),
+                              Locale("tt"),
+                              Locale("uk"),
+                              Locale("ug"),
+                              Locale("ur"),
+                              Locale("uz"),
+                              Locale("vi"),
+                              Locale("zh")
+                              // Locale('en'),
+                              // Locale('hi'),
+                              // Locale('ar'),
+                              // Locale('ko'),
+                              // Locale('pt'),
+                              // Locale('vi'),
+                            ],
+                            localizationsDelegates: [
+                              AppLocalizations.delegate,
+                              CountryLocalizations.delegate,
+                              GlobalMaterialLocalizations.delegate,
+                              GlobalWidgetsLocalizations.delegate,
+                              GlobalCupertinoLocalizations.delegate,
+                            ],
+                            debugShowCheckedModeBanner: false,
+                            theme: themeState is LightThemeState
+                                ? ThemeData.light()
+                                : ThemeData.dark(),
+                          ),
                         ),
                       );
                     },

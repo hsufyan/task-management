@@ -28,8 +28,6 @@ import '../../bloc/permissions/permissions_bloc.dart';
 import '../../bloc/permissions/permissions_event.dart';
 
 
-import '../../bloc/task/task_bloc.dart';
-import '../../bloc/task/task_event.dart';
 import '../../bloc/task_discussion/task_timeline/task_status_timeline_bloc.dart';
 import '../../bloc/theme/theme_bloc.dart';
 import '../../bloc/theme/theme_state.dart';

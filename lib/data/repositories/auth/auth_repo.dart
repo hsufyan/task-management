@@ -39,7 +39,7 @@ class AuthRepository {
       required String type,
       required String lastname,
       required String company,
-      required int role,
+      required String role,
       required String email,
       required String password,
       required String conpassword}) async {

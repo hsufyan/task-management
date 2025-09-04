@@ -8,33 +8,33 @@ abstract class TaskEvent extends Equatable {
 class TaskCreated extends TaskEvent {
   final String title;
   final int statusId;
-  final int priorityId;
+ // final int priorityId;
   final String startDate;
   final String dueDate;
   final String desc;
-  final int project;
+  //final int project;
   final String note;
   final List<int> userId;
 
   TaskCreated(
       {required this.title,
       required this.statusId,
-      required this.priorityId,
+   //   required this.priorityId,
       required this.startDate,
       required this.dueDate,
       required this.desc,
-      required this.project,
+    //  required this.project,
       required this.userId,
       required this.note});
   @override
   List<Object> get props => [
         title,
         statusId,
-        priorityId,
+      //  priorityId,
         startDate,
         dueDate,
         desc,
-        project,
+     //   project,
         note,
         userId,
       ];
@@ -136,7 +136,7 @@ class SearchTasks extends TaskEvent {
 class LoadMore extends TaskEvent {
   final List<int>? userId;
   final List<int>? clientId;
-  final List<int>? priorityId;
+  //final List<int>? priorityId;
   final List<int>? statusId;
   final List<int>? projectId;
   final String? fromDate;
@@ -144,12 +144,18 @@ class LoadMore extends TaskEvent {
   final String? searchQuery;
   final int? id;
   final int? isFav;
-  LoadMore({this.id,this.projectId,this.clientId,this.userId,this.statusId,this.priorityId,this.fromDate,this.toDate,this.searchQuery,this.isFav});
+  LoadMore({this.id,this.projectId,this.clientId,this.userId,this.statusId,
+  
+ // this.priorityId
+  
+  this.fromDate,this.toDate,this.searchQuery,this.isFav});
 
 
 
   @override
-  List<Object?> get props => [id,projectId,searchQuery,clientId,userId,statusId,priorityId,fromDate,toDate];
+  List<Object?> get props => [id,projectId,searchQuery,clientId,userId,statusId,
+ // priorityId,
+  fromDate,toDate];
 }
 class LoadMoreToday extends TaskEvent {
   final String fromDate;

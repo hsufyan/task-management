@@ -90,7 +90,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         );
         return;
       }
-      isLoading = true;
+      setState(() {
+        isLoading = true;
+      });
       BlocProvider.of<AuthBloc>(context).add(AuthSignUp(
           context: context,
           email: emailController.text,
@@ -104,18 +106,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
       final signUp = context.read<AuthBloc>();
       signUp.stream.listen((state) {
         if (state is AuthSignUpLoadSuccess) {
-          isLoading=false;
+          setState(() {
+            isLoading = false;
+          });
           if (mounted) {
             flutterToastCustom(
               msg: AppLocalizations.of(context)!.registeredsuccessfully,
               color: AppColors.primary,
             );
-            router.push("/login");
+            router.go("/login"); // Use go instead of push to replace the route
           }
         }
 
         if (state is AuthSignUpLoadFailure) {
-          isLoading=false;
+          setState(() {
+            isLoading = false;
+          });
           flutterToastCustom(msg: state.message);
         }
       });
@@ -124,7 +130,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         msg: AppLocalizations.of(context)!.pleasefilltherequiredfield,
       );
     }
-
   }
 
   _fieldFocusChange(
@@ -135,14 +140,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   void initState() {
-
     CheckInternet.initConnectivity().then((List<ConnectivityResult> results) {
-
       if (results.isNotEmpty) {
         setState(() {
           _connectionStatus = results;
         });
-
       }
     });
 
@@ -170,18 +172,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ? NoInternetScreen()
         : Scaffold(
             backgroundColor: Theme.of(context).colorScheme.backGroundColor,
-            body: signupBloc(isLightTheme,isLoading));
+            body: signupBloc(isLightTheme, isLoading));
   }
 
-  Widget signupBloc(isLightTheme,isLoading) {
+  Widget signupBloc(isLightTheme, isLoading) {
+    
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
-
       if (state is AuthLoadFailure) {
       } else if (state is AuthLoadSuccess) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           router.go('/login');
         });
       }
+
       return SingleChildScrollView(
           child: SizedBox(
               height: MediaQuery.of(context).size.height,
@@ -316,8 +319,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 );
                               },
                               decoration: InputDecoration(
-                                labelText:
-                                    null,
+                                labelText: null,
                                 label: RichText(
                                   text: TextSpan(
                                     text: AppLocalizations.of(context)!
@@ -408,12 +410,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     style: TextStyle(fontSize: 14.sp),
                                     cursorColor: AppColors.greyForgetColor,
                                     cursorWidth: 1.w,
-
                                     controller: companyController,
                                     keyboardType: TextInputType.text,
-
-                                    onSaved: (String? value) {
-                                    },
+                                    onSaved: (String? value) {},
                                     onFieldSubmitted: (v) {
                                       _fieldFocusChange(
                                         context,
@@ -456,12 +455,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               inputFormatters: [
                                 FilteringTextInputFormatter.deny(RegExp('[ ]')),
                               ],
-                              onSaved: (String? value) {
-                              },
+                              onSaved: (String? value) {},
 
                               decoration: InputDecoration(
-                                labelText:
-                                    null,
+                                labelText: null,
                                 label: RichText(
                                   text: TextSpan(
                                     text: 'Password',
@@ -475,8 +472,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       TextSpan(
                                         text: ' *',
                                         style: TextStyle(
-                                          color: Colors
-                                              .red,
+                                          color: Colors.red,
                                           fontSize: 13,
                                         ),
                                       ),
@@ -489,13 +485,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       color: AppColors.hintColor),
                                 ),
                                 suffixIcon: InkWell(
-                                  highlightColor:
-                                      Colors.transparent,
+                                  highlightColor: Colors.transparent,
                                   splashColor: Colors.transparent,
                                   onTap: () {
                                     setState(() {
                                       _showPassword = !_showPassword!;
-
                                     });
                                   },
                                   child: Padding(
@@ -508,7 +502,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       color: Theme.of(context)
                                           .colorScheme
                                           .fontColor
-                                          .withValues(alpha:0.4),
+                                          .withValues(alpha: 0.4),
                                       size: 22,
                                     ),
                                   ),
@@ -600,27 +594,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           BlocBuilder<AuthBloc, AuthState>(
                             builder: (context, state) {
                               if (state is AuthSignUpLoadSuccess) {
-                                WidgetsBinding.instance
-                                    .addPostFrameCallback((_) {
-                                  router.go('/login');
-                                });
+                                // Remove this navigation
+                                // WidgetsBinding.instance.addPostFrameCallback((_) {
+                                //   router.go('/login');
+                                // });
                               }
                               if (state is AuthLoadInProgress) {}
                               if (state is AuthLoadFailure) {}
                               if (state is AuthInitial) {}
                               return InkWell(
-                                highlightColor:
-                                    Colors.transparent, // No highlight on tap
+                                highlightColor: Colors.transparent,
                                 splashColor: Colors.transparent,
                                 onTap: () {
                                   FocusScope.of(context).unfocus();
                                   validateAndSubmit();
                                 },
-                                child:  CustomButton(
+                                child: CustomButton(
                                   height: 50.h,
                                   isLoading: isLoading,
-                                  isLogin:true,
-                                  isBorder:true,
+                                  isLogin: true,
+                                  isBorder: true,
                                   text: AppLocalizations.of(context)!.signUp,
                                   textcolor: AppColors.pureWhiteColor,
                                 ),

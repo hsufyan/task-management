@@ -204,7 +204,8 @@ class _HomeScreenState extends State<HomeScreen> {
     context.read<DashBoardStatsBloc>().totaluser.toString();
     context.read<DashBoardStatsBloc>().totalClient.toString();
     context.read<DashBoardStatsBloc>().totalMeeting.toString();
-    BlocProvider.of<ChartBloc>(context).add(FetchChartData(endDate: "",startDate: ""));
+    BlocProvider.of<ChartBloc>(context)
+        .add(FetchChartData(endDate: "", startDate: ""));
 
     BlocProvider.of<WorkspaceBloc>(context).add(const WorkspaceList());
     BlocProvider.of<ProjectBloc>(context).add(ProjectDashBoardList());
@@ -250,7 +251,7 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         // Perform other updates for non-'Client' role
         BlocProvider.of<WorkAnniversaryBloc>(context)
-            .add(WeekWorkAnniversaryList([],[], 7));
+            .add(WeekWorkAnniversaryList([], [], 7));
         BlocProvider.of<BirthdayBloc>(context).add(WeekBirthdayList(7, [], []));
         BlocProvider.of<LeaveReqDashboardBloc>(context)
             .add(WeekLeaveReqListDashboard([], 7));
@@ -264,7 +265,6 @@ class _HomeScreenState extends State<HomeScreen> {
       userSelectedId = userId;
     });
   }
-
 
   void _handleUsersNameForAnni(List<String> userName, List<int> userId) {
     setState(() {
@@ -289,20 +289,23 @@ class _HomeScreenState extends State<HomeScreen> {
   bool projectChart = false;
   bool taskChart = false;
   void handleIsProjectChart(
-      bool status,
-      ) {
+    bool status,
+  ) {
     setState(() {
       // userId = id;
       projectChart = status;
     });
-  }  void handleIsTaskChart(
-      bool status,
-      ) {
+  }
+
+  void handleIsTaskChart(
+    bool status,
+  ) {
     setState(() {
       // userId = id;
       taskChart = status;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     print("hfedfj ${context.read<UserProfileBloc>().role}");
@@ -386,24 +389,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                 listener: (context, state) {
                           if (state is NotificationPaginated) {}
                         }, builder: (context, state) {
-                           print("eslirkgjxg ${context.read<NotificationBloc>().totalUnreadCount == 0}");
+                          print(
+                              "eslirkgjxg ${context.read<NotificationBloc>().totalUnreadCount == 0}");
                           if (state is UnreadNotification) {
-
-                            return state.total == 0 ?SizedBox():Container(
-                              height: 15.sp,
-                              width: 15.sp,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.yellow.shade800,
-                              ),
-                              child: Center(
-                                  child: CustomText(
-                                size: 10,
-                                fontWeight: FontWeight.w600,
-                                text: state.total.toString(),
-                                color: AppColors.pureWhiteColor,
-                              )),
-                            );
+                            return state.total == 0
+                                ? SizedBox()
+                                : Container(
+                                    height: 15.sp,
+                                    width: 15.sp,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.yellow.shade800,
+                                    ),
+                                    child: Center(
+                                        child: CustomText(
+                                      size: 10,
+                                      fontWeight: FontWeight.w600,
+                                      text: state.total.toString(),
+                                      color: AppColors.pureWhiteColor,
+                                    )),
+                                  );
                           }
                           return SizedBox();
                         }))
@@ -456,12 +461,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 _totalstats(isLightTheme),
                 Row(
                   children: [
-                    SizedBox(width: 9.w,),
-                    Expanded(child: DoughnutChart(type:"project",title: AppLocalizations.of(context)!.projectstats,isReverse:false,onChangeForProject: handleIsProjectChart,onChangeForTask: (bool _) {})),
-                // SizedBox(width: 10.w,),
-                Expanded(child:     DoughnutChart(type:"task",title: AppLocalizations.of(context)!.taskectstats,isReverse: false,onChangeForTask: handleIsTaskChart,onChangeForProject: (bool _) {}),
-                ),
-                    SizedBox(width: 9.w,),
+                    SizedBox(
+                      width: 9.w,
+                    ),
+                    Expanded(
+                        child: DoughnutChart(
+                            type: "project",
+                            title: AppLocalizations.of(context)!.projectstats,
+                            isReverse: false,
+                            onChangeForProject: handleIsProjectChart,
+                            onChangeForTask: (bool _) {})),
+                    // SizedBox(width: 10.w,),
+                    Expanded(
+                      child: DoughnutChart(
+                          type: "task",
+                          title: AppLocalizations.of(context)!.taskectstats,
+                          isReverse: false,
+                          onChangeForTask: handleIsTaskChart,
+                          onChangeForProject: (bool _) {}),
+                    ),
+                    SizedBox(
+                      width: 9.w,
+                    ),
                   ],
                 ),
 
@@ -469,8 +490,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 15.h,
                 ),
                 Padding(
-                  padding:  EdgeInsets.symmetric(horizontal: 10.w),
-                  child:     DoughnutChart(title: AppLocalizations.of(context)!.todosoverview,isReverse: true,onChangeForProject: (bool _) {},onChangeForTask: (bool _) {}),
+                  padding: EdgeInsets.symmetric(horizontal: 10.w),
+                  child: DoughnutChart(
+                      title: AppLocalizations.of(context)!.todosoverview,
+                      isReverse: true,
+                      onChangeForProject: (bool _) {},
+                      onChangeForTask: (bool _) {}),
                 ),
                 SizedBox(
                   height: 15.h,
@@ -969,9 +994,9 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: EdgeInsets.symmetric(horizontal: 18.w),
         child: BlocConsumer<WorkspaceBloc, WorkspaceState>(
             listener: (context, state) {
-              if (state is WorkspacePaginated) {}
-            }, builder: (context, state) {
-              print("efhjdbn $state");
+          if (state is WorkspacePaginated) {}
+        }, builder: (context, state) {
+          print("efhjdbn $state");
           if (state is WorkspacePaginated) {
             return InkWell(
               onTap: () {
@@ -997,29 +1022,29 @@ class _HomeScreenState extends State<HomeScreen> {
                   // height: 127.h,
                   child: Center(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 18.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            CustomText(
-                              text: workSpaceTitle ??
-                                  context
-                                      .read<AuthBloc>()
-                                      .workspaceTitleUpdated
-                                      .toString(),
-                              color: AppColors.pureWhiteColor,
-                              size: 15.sp,
-                              fontWeight: FontWeight.w800,
-                            ),
-                            const HeroIcon(
-                              HeroIcons.chevronRight,
-                              style: HeroIconStyle.outline,
-                              // color: Theme.of(context).colorScheme.textClrChange,
-                              color: AppColors.pureWhiteColor,
-                            ),
-                          ],
+                    padding: EdgeInsets.symmetric(horizontal: 18.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomText(
+                          text: workSpaceTitle ??
+                              context
+                                  .read<AuthBloc>()
+                                  .workspaceTitleUpdated
+                                  .toString(),
+                          color: AppColors.pureWhiteColor,
+                          size: 15.sp,
+                          fontWeight: FontWeight.w800,
                         ),
-                      ))),
+                        const HeroIcon(
+                          HeroIcons.chevronRight,
+                          style: HeroIconStyle.outline,
+                          // color: Theme.of(context).colorScheme.textClrChange,
+                          color: AppColors.pureWhiteColor,
+                        ),
+                      ],
+                    ),
+                  ))),
             );
           }
           if (state is WorkspaceLoading) {
@@ -1044,16 +1069,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   // height: 127.h,
                 ));
           }
-          if(state is WorkspaceError){
-            flutterToastCustom(
-              msg: state.errorMessage,
-              color: Colors.red
-            );
+          if (state is WorkspaceError) {
+            flutterToastCustom(msg: state.errorMessage, color: Colors.red);
           }
           return SizedBox.shrink();
         }));
   }
-
 
   Widget _totalstats(isLightTheme) {
     return Padding(
@@ -1381,7 +1402,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   )
                 ],
               );
-
             } else if (state is DashBoardStatsError) {
               // Show error message
               return Center(
@@ -1916,9 +1936,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: AppColors.greyColor,
                                   ),
                                 ),
-                              ):const SizedBox.shrink(),
-
-                        role == "admin"    ? InkWell(
+                              )
+                            : const SizedBox.shrink(),
+                        role == "admin"
+                            ? InkWell(
                                 splashColor: Colors.transparent,
                                 onTap: () {
                                   router.push("/settings");
@@ -2253,74 +2274,76 @@ class _HomeScreenState extends State<HomeScreen> {
                                     )
                                   : const SizedBox.shrink(),
                               context.read<PermissionsBloc>().isManageStatus ==
-                                  true
+                                      true
                                   ? InkWell(
-                                splashColor: Colors.transparent,
-                                onTap: () {
-                                  toggleDrawer(false);
-                                  router.push("/Status");
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 10.h),
-                                  child: Row(
-                                    children: [
-                                      const HeroIcon(
-                                        size: 26,
-                                        HeroIcons.square2Stack,
-                                        style: HeroIconStyle.outline,
-                                        color: AppColors.greyColor,
+                                      splashColor: Colors.transparent,
+                                      onTap: () {
+                                        toggleDrawer(false);
+                                        router.push("/Status");
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 10.h),
+                                        child: Row(
+                                          children: [
+                                            const HeroIcon(
+                                              size: 26,
+                                              HeroIcons.square2Stack,
+                                              style: HeroIconStyle.outline,
+                                              color: AppColors.greyColor,
+                                            ),
+                                            SizedBox(
+                                              width: 20.w,
+                                            ),
+                                            CustomText(
+                                              text:
+                                                  AppLocalizations.of(context)!
+                                                      .statuses,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .textClrChange,
+                                            )
+                                          ],
+                                        ),
                                       ),
-                                      SizedBox(
-                                        width: 20.w,
-                                      ),
-                                      CustomText(
-                                        text:
-                                        AppLocalizations.of(context)!
-                                            .statuses,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .textClrChange,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
+                                    )
                                   : const SizedBox.shrink(),
-                              context.read<PermissionsBloc>().isManagePriority ==
-                                  true
+                              context
+                                          .read<PermissionsBloc>()
+                                          .isManagePriority ==
+                                      true
                                   ? InkWell(
-                                splashColor: Colors.transparent,
-                                onTap: () {
-                                  toggleDrawer(false);
-                                  router.push("/priorities");
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 10.h),
-                                  child: Row(
-                                    children: [
-                                      const HeroIcon(
-                                        size: 26,
-                                        HeroIcons.arrowUp,
-                                        style: HeroIconStyle.outline,
-                                        color: AppColors.greyColor,
+                                      splashColor: Colors.transparent,
+                                      onTap: () {
+                                        toggleDrawer(false);
+                                        router.push("/priorities");
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 10.h),
+                                        child: Row(
+                                          children: [
+                                            const HeroIcon(
+                                              size: 26,
+                                              HeroIcons.arrowUp,
+                                              style: HeroIconStyle.outline,
+                                              color: AppColors.greyColor,
+                                            ),
+                                            SizedBox(
+                                              width: 20.w,
+                                            ),
+                                            CustomText(
+                                              text:
+                                                  AppLocalizations.of(context)!
+                                                      .priorities,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .textClrChange,
+                                            )
+                                          ],
+                                        ),
                                       ),
-                                      SizedBox(
-                                        width: 20.w,
-                                      ),
-                                      CustomText(
-                                        text:
-                                        AppLocalizations.of(context)!
-                                            .priorities,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .textClrChange,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
+                                    )
                                   : const SizedBox.shrink(),
                               context
                                           .read<PermissionsBloc>()
@@ -2458,6 +2481,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     )
                                   : const SizedBox.shrink(),
                             ],
+                          
                           ),
                         );
                       }
@@ -2739,8 +2763,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     width: 20.w,
                                   ),
                                   CustomText(
-                                    text: AppLocalizations.of(context)!
-                                        .settings,
+                                    text:
+                                        AppLocalizations.of(context)!.settings,
                                     color: Theme.of(context)
                                         .colorScheme
                                         .textClrChange,
@@ -2926,7 +2950,7 @@ Widget _myProject(
                               date = formatDateFromApi(
                                   project.startDate!, context);
                             }
-print("frdnjhkc m ${project.priority}");
+                            print("frdnjhkc m ${project.priority}");
                             return Padding(
                                 padding: EdgeInsets.only(right: 10.w),
                                 child: InkWell(
@@ -3096,7 +3120,8 @@ print("frdnjhkc m ${project.priority}");
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                project.status == null&& project.status !=""
+                                                project.status == null &&
+                                                        project.status != ""
                                                     ? SizedBox.shrink()
                                                     : Column(
                                                         mainAxisAlignment:
@@ -3157,7 +3182,8 @@ print("frdnjhkc m ${project.priority}");
                                                           ),
                                                         ],
                                                       ),
-                                                project.priority == null && project.priority !=""
+                                                project.priority == null &&
+                                                        project.priority != ""
                                                     ? SizedBox.shrink()
                                                     : Column(
                                                         crossAxisAlignment:

@@ -734,11 +734,11 @@ class _SeeAllTaskState extends State<SeeAllTask> {
                           scrollInfo.metrics.maxScrollExtent) {
                     context.read<TaskBloc>().add(LoadMore(
                         searchQuery: searchValue!,
-                        projectId: projectSelectedIdS,
+                      //  projectId: projectSelectedIdS,
                         clientId: clientSelectedIdS,
                         userId: userSelectedIdS,
                         statusId: statusSelectedIdS,
-                        priorityId: prioritySelectedIdS,
+                        //priorityId: prioritySelectedIdS,
                         fromDate: fromDate,
                         toDate: toDate));
                   }

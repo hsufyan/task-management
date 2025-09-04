@@ -12,18 +12,14 @@ import 'package:taskify/data/model/Project/all_project.dart';
 import 'package:taskify/utils/widgets/custom_dimissible.dart';
 import 'package:taskify/utils/widgets/row_dashboard.dart';
 import 'package:taskify/utils/widgets/shake_widget.dart';
-
 import '../../bloc/clients/client_bloc.dart';
 import '../../bloc/clients/client_event.dart';
 import '../../bloc/clients/client_state.dart';
-
 import '../../bloc/priority/priority_state.dart';
-
 import '../../bloc/project_filter/project_filter_bloc.dart';
 import '../../bloc/project_filter/project_filter_event.dart';
 import '../../bloc/project_filter/project_filter_state.dart';
 import '../../bloc/tags/tags_state.dart';
-
 import '../../bloc/multi_tag/tag_multi_bloc.dart';
 import '../../bloc/multi_tag/tag_multi_event.dart';
 import '../../bloc/multi_tag/tag_multi_state.dart';
@@ -69,7 +65,6 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import '../widgets/no_permission_screen.dart';
 import '../widgets/search_field.dart';
-
 import '../widgets/user_client_box.dart';
 
 class ProjectScreen extends StatefulWidget {
@@ -84,6 +79,8 @@ double progress = 0.6;
 class _ProjectScreenState extends State<ProjectScreen>
     with TickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
+
+    
       duration: const Duration(milliseconds: 200), vsync: this, value: 1.0);
   late final AnimationController _pinnedcController = AnimationController(
       duration: const Duration(milliseconds: 200), vsync: this, value: 1.0);
@@ -94,7 +91,6 @@ class _ProjectScreenState extends State<ProjectScreen>
   bool hasShownShowcase = false;
   String _lastWords = "";
   String searchword = "";
-
   bool isListening =
       false; // Flag to track if speech recognition is in progress
   bool dialogShown = false;
@@ -527,9 +523,9 @@ class _ProjectScreenState extends State<ProjectScreen>
     box.put("isFirstCase", value);
   }
 
-  void onShowCaseCompleted() {
-    _setIsFirst(false);
-  }
+  // void onShowCaseCompleted() {
+  //   _setIsFirst(false);
+  // }
 
   Future<void> _onRefresh() async {
     setState(() {
@@ -650,65 +646,44 @@ class _ProjectScreenState extends State<ProjectScreen>
     bool isLightTheme = currentTheme is LightThemeState;
 
     return Scaffold(
-        floatingActionButton: (context
-                    .read<PermissionsBloc>()
-                    .iscreateProject ==
-                true)
-            ? Padding(
-                padding: EdgeInsets.only(bottom: 60.h),
-                child: FloatingActionButton(
-                  isExtended: true,
-                  onPressed: () {
-                    context.read<PermissionsBloc>().iscreateProject == true
-                        ? router.push('/createproject', extra: {
-                            "id": 0,
-                            "isCreate": true,
-                            "title": "",
-                            "desc": "",
-                            "start": "",
-                            "budget": "",
-                            "end": "",
-                            // "user":task.users,
-                            'priority': "",
-                            'priorityId': 0,
-                            'statusId': 0,
-                            'note': "",
-                            'status': "",
-                          })
-                        : null;
-                  }, // Icon inside the FAB
-                  backgroundColor: AppColors.primary,
-                  child: isFirstTimeUSer == true
-                      ? Showcase(
-                          onTargetClick: () {
-                            ShowCaseWidget.of(context)
-                                .completed(_one); // Manually complete the step
-                            if (ShowCaseWidget.of(context).activeWidgetId ==
-                                1) {
-                              onShowCaseCompleted(); // Trigger this after the last showcase step
-                            }
-                          },
-                          key: _one,
-                          titleAlignment: Alignment.center,
-                          title: 'Add Project',
-                          titleTextStyle:
-                              const TextStyle(fontSize: 14, color: Colors.grey),
-                          descTextStyle: const TextStyle(
-                              fontSize: 12, color: AppColors.textsub2Color),
-                          description:
-                              'Add new Project data by clicking this button.',
-                          child: const Icon(
-                            Icons.add,
-                            color: AppColors.whiteColor,
-                          ),
-                        )
-                      : const Icon(
-                          Icons.add,
-                          color: AppColors.whiteColor,
-                        ), // Background color of the FAB
-                ),
-              )
-            : SizedBox.shrink(),
+        floatingActionButton:
+            (context.read<PermissionsBloc>().iscreateProject == true)
+                ? Padding(
+                    padding: EdgeInsets.only(bottom: 60.h),
+                    child: FloatingActionButton(
+                      isExtended: true,
+                      onPressed: () {
+                        context.read<PermissionsBloc>().iscreateProject == true
+                            ? router.push('/createproject', extra: {
+                                "id": 0,
+                                "isCreate": true,
+                                "title": "",
+                                "desc": "",
+                                "start": "",
+                                "budget": "",
+                                "end": "",
+                                // "user":task.users,
+                                'priority': "",
+                                'priorityId': 0,
+                                'statusId': 0,
+                                'note': "",
+                                'status': "",
+                              })
+                            : null;
+                      }, // Icon inside the FAB
+                      backgroundColor: AppColors.primary,
+                      child: isFirstTimeUSer == true
+                          ? const Icon(
+                              Icons.add,
+                              color: AppColors.whiteColor,
+                            )
+                          : const Icon(
+                              Icons.add,
+                              color: AppColors.whiteColor,
+                            ), // Background color of the FAB
+                    ),
+                  )
+                : SizedBox.shrink(),
         backgroundColor: Theme.of(context).colorScheme.backGroundColor,
         body: Container(
           color: Theme.of(context).colorScheme.backGroundColor,
@@ -926,7 +901,7 @@ class _ProjectScreenState extends State<ProjectScreen>
                                                                     if (ShowCaseWidget.of(context)
                                                                             .activeWidgetId ==
                                                                         1) {
-                                                                      onShowCaseCompleted();
+                                                                      //  onShowCaseCompleted();
                                                                     }
                                                                     _setIsFirst(
                                                                         false);
@@ -964,7 +939,8 @@ class _ProjectScreenState extends State<ProjectScreen>
                                                                   index,
                                                                   project,
                                                                   date,
-                                                                  isLightTheme),
+                                                                  isLightTheme
+                                                                  ),
                                                         )
                                                       : projectList(
                                                           state.project,
@@ -2243,7 +2219,9 @@ class _ProjectScreenState extends State<ProjectScreen>
                                     height: 30.h,
                                     decoration: BoxDecoration(
                                         boxShadow: [
-                                          isLightTheme ? MyThemes.lightThemeShadow : MyThemes.darkThemeShadow,
+                                          isLightTheme
+                                              ? MyThemes.lightThemeShadow
+                                              : MyThemes.darkThemeShadow,
                                         ],
                                         color: Theme.of(context)
                                             .colorScheme
@@ -2284,7 +2262,9 @@ class _ProjectScreenState extends State<ProjectScreen>
                                     height: 30.h,
                                     decoration: BoxDecoration(
                                         boxShadow: [
-                                          isLightTheme ? MyThemes.lightThemeShadow : MyThemes.darkThemeShadow,
+                                          isLightTheme
+                                              ? MyThemes.lightThemeShadow
+                                              : MyThemes.darkThemeShadow,
                                         ],
                                         color: Theme.of(context)
                                             .colorScheme

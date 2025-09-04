@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:taskify/bloc/setting/settings_state.dart';
 import 'package:taskify/bloc/setting/settings_bloc.dart';
@@ -20,7 +18,6 @@ import '../../config/strings.dart';
 import '../../data/GlobalVariable/globalvariable.dart';
 import '../../data/repositories/Auth/auth_repo.dart';
 import '../../routes/routes.dart';
-import '../../config/internet_connectivity.dart';
 import '../../utils/widgets/toast_widget.dart';
 
 class StreamSubscriptionManager {
@@ -34,11 +31,12 @@ class StreamSubscriptionManager {
 }
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen(
-      {super.key,
-      required this.navigateAfterSeconds,
-      required this.imageUrl,
-      this.title});
+  const SplashScreen({
+    super.key,
+    required this.navigateAfterSeconds,
+    required this.imageUrl,
+    this.title,
+  });
 
   final int navigateAfterSeconds;
   final String imageUrl;
@@ -48,98 +46,62 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
   String? fromDate;
   String? toDate;
-  bool? isFirstTimeUSer;
-
-  String connectionStatus = 'Unknown';
+  bool? isFirstTimeUser;
   String? fcmToken;
-  void _getFCMToken() async {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-    String? token = await messaging.getToken();
-    setState(() {
-      fcmToken = token;
-    });
-    AuthRepository().getFcmId(fcmId: token);
-    await HiveStorage.setFcm(token!);
-  }
 
-  List<ConnectivityResult> _connectionStatus = [ConnectivityResult.none];
-  final Connectivity _connectivity = Connectivity();
-  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+  final _subscriptionManager = StreamSubscriptionManager();
 
-  ConnectivityResult connectivityCheck = ConnectivityResult.none;
-  PermissionsBloc? permission;
   @override
   void initState() {
-    // router.go('/login');
     super.initState();
-    CheckInternet.initConnectivity().then((List<ConnectivityResult> results) {
-      if (results.isNotEmpty) {
-        setState(() {
-          _connectionStatus = results;
-        });
-        debugPrint("$_connectivitySubscription");
-        debugPrint("$_connectionStatus");
-      }
+
+    // Start navigation logic after the specified delay
+    Future.delayed(Duration(seconds: widget.navigateAfterSeconds), () {
+      _initializeAsync();
     });
 
-    _connectivitySubscription = _connectivity.onConnectivityChanged
-        .listen((List<ConnectivityResult> results) {
-      if (results.isNotEmpty) {
-        CheckInternet.updateConnectionStatus(results).then((value) {
-          setState(() {
-            _connectionStatus = value;
-          });
-        });
-      } else {
-        flutterToastCustom(
-            msg: AppLocalizations.of(context)!.nointernet,
-            color: AppColors.red);
-      }
-    });
-    permission = context.read<PermissionsBloc>();
-    FirebaseMessaging.instance
-        .getInitialMessage()
-        .then((RemoteMessage? message) {
+    // Handle Firebase initial message
+    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
       if (message != null) {
-        context.read<PermissionsBloc>().add(GetPermissions());
-        final payload = ({
-          'type': message.data['type'],
-          'item': jsonDecode(message.data['item']),
-        });
-        final Map<String, dynamic> data = (payload["item"]);
-        final String type = data['type'];
-        if (type == "project") {
-          final Map<String, dynamic> item = data['item'];
-
-          final int id = item['id'];
-          router.push('/projectdetails', extra: {"id": id, "fromNoti": true});
-        } else if (type == "task") {
-          final Map<String, dynamic> item = data['item'];
-          router.push(
-            '/taskdetail',
-            extra: {
-              "fromNoti": true,
-              "id": item['id'],
-            },
-          );
-        } else if (type == "meeting") {
-          router.push('/meetings', extra: {"fromNoti": true});
-        } else if (type == "leave_request") {
-          router.push('/leaverequest', extra: {"fromNoti": true});
-        } else if (type == "workspace") {
-          router.push('/workspaces', extra: {
-            "fromNoti": true,
-          });
+        try {
+          context.read<PermissionsBloc>().add(GetPermissions());
+          final payload = {
+            'type': message.data['type'],
+            'item': jsonDecode(message.data['item']),
+          };
+          final Map<String, dynamic> data = payload['item'];
+          final String type = data['type'];
+          if (type == 'project') {
+            final Map<String, dynamic> item = data['item'];
+            final int id = item['id'];
+            router.push('/projectdetails', extra: {'id': id, 'fromNoti': true});
+          } else if (type == 'task') {
+            final Map<String, dynamic> item = data['item'];
+            router.push(
+              '/taskdetail',
+              extra: {
+                'fromNoti': true,
+                'id': item['id'],
+              },
+            );
+          } else if (type == 'meeting') {
+            router.push('/meetings', extra: {'fromNoti': true});
+          } else if (type == 'leave_request') {
+            router.push('/leaverequest', extra: {'fromNoti': true});
+          } else if (type == 'workspace') {
+            router.push('/workspaces', extra: {'fromNoti': true});
+          }
+        } catch (e) {
+          debugPrint('[Debug] Error handling Firebase message: $e');
+          _initializeAsync(); // Fallback to default navigation
         }
-      } else {
-        Future.delayed(Duration(seconds: 2), () {
-          _initializeAsync();
-        });
       }
+    }).catchError((error) {
+      debugPrint('[Debug] Error getting Firebase initial message: $error');
+      _initializeAsync(); // Ensure navigation proceeds even if Firebase fails
     });
 
     _getFirstTimeUser();
@@ -147,96 +109,80 @@ class _SplashScreenState extends State<SplashScreen>
     _getFCMToken();
   }
 
-  final _subscriptionManager = StreamSubscriptionManager();
+  void _getFCMToken() async {
+    try {
+      FirebaseMessaging messaging = FirebaseMessaging.instance;
+      String? token = await messaging.getToken();
+      if (token != null) {
+        setState(() {
+          fcmToken = token;
+        });
+        AuthRepository().getFcmId(fcmId: token); // Handle errors in AuthRepository
+        HiveStorage.setFcm(token);
+      } else {
+        debugPrint('[Debug] FCM token is null');
+      }
+    } catch (e) {
+      debugPrint('[Debug] Error in _getFCMToken: $e');
+    }
+  }
 
   Future<void> _getLanguage() async {
-    await LanguageBloc.initLanguage();
+    try {
+      await LanguageBloc.initLanguage();
+    } catch (e) {
+      debugPrint('[Debug] Error initializing language: $e');
+    }
+  }
+
+  Future<void> _getFirstTimeUser() async {
+    try {
+      var box = await Hive.openBox(authBox);
+      setState(() {
+        isFirstTimeUser = box.get(firstTimeUserKey) ?? true;
+      });
+      debugPrint('[Debug] isFirstTimeUser: $isFirstTimeUser');
+    } catch (e) {
+      debugPrint('[Debug] Error getting first-time user: $e');
+    }
   }
 
   Future<void> _initializeAsync() async {
     try {
-      final token = await HiveStorage.isToken();
+      if (!mounted) {
+        debugPrint('[Debug] Widget not mounted, aborting navigation');
+        return;
+      }
 
-      if (token == false && isFirstTimeUSer == true) {
+      final token = await HiveStorage.isToken();
+      debugPrint('[Debug] Token exists: $token');
+
+      if (token == false && isFirstTimeUser == true) {
+        debugPrint('[Debug] Navigating to onboarding');
         router.go('/onboarding');
         return;
       }
 
-      if (isFirstTimeUSer == false && token == false) {
+      if (token == false && isFirstTimeUser == false) {
+        debugPrint('[Debug] Navigating to login');
         router.go('/login');
         return;
       }
 
-      if (token == true && isFirstTimeUSer == false) {
-        final context = navigatorKey.currentContext;
-        if (context == null) {
-          print("[Debug] Error: No valid context");
-          return;
-        }
-
-        // Get bloc references first
-        final settingsBloc = navigatorKey.currentContext!.read<SettingsBloc>();
-        final permissionsBloc =
-            navigatorKey.currentContext!.read<PermissionsBloc>();
-        // Set up permissions stream BEFORE adding events
-        _subscriptionManager._permissionsSubscription?.cancel();
-        _subscriptionManager._permissionsSubscription =
-            permissionsBloc.stream.listen(
-          (state) {
-            if (state is PermissionsSuccess) {
-              router.go('/dashboard');
-            } else if (state is PermissionsError) {
-              router.go("/emailVerification");
-            }
-          },
-          onError: (error) {
-            print("[Debug] Permissions stream error: $error");
-            router.go("/emailVerification");
-          },
-        );
-
-        print("[Debug] Permissions stream listener set up");
-
-        // Set up settings stream
-        _subscriptionManager._settingsSubscription?.cancel();
-        _subscriptionManager._settingsSubscription = settingsBloc.stream.listen(
-          (state) {
-            print("[Debug] Settings stream received state: $state");
-            if (state is SettingsSuccess) {
-              print("[Debug] Settings Success");
-            } else if (state is SettingsError) {
-              print("[Debug] Settings Error");
-              router.go("/emailVerification");
-              flutterToastCustom(msg: state.errorMessage);
-            }
-          },
-          onError: (error) {
-            print("[Debug] Settings stream error: $error");
-            router.go("/emailVerification");
-          },
-        );
-
-        print("[Debug] All streams set up, now adding events");
-
-        // Now dispatch events
-        settingsBloc.add(const SettingsList("general_settings"));
-        permissionsBloc.add(GetPermissions());
-
-        print("[Debug] Events dispatched");
+      if (token == true) {
+        debugPrint('[Debug] Navigating to dashboard');
+        router.go('/dashboard');
+        return;
       }
     } catch (e) {
-      print("[Debug] Initialization error: $e");
-      router.go("/emailVerification");
+      debugPrint('[Debug] Initialization error: $e');
+      router.go('/login'); // Fallback to login on error
     }
-  }
-
-  _getFirstTimeUser() async {
-    var box = await Hive.openBox(authBox);
-    isFirstTimeUSer = box.get(firstTimeUserKey) ?? true;
   }
 
   @override
   void dispose() {
+    _subscriptionManager.dispose();
     super.dispose();
   }
 
@@ -247,9 +193,11 @@ class _SplashScreenState extends State<SplashScreen>
       body: Center(
         child: Container(
           decoration: BoxDecoration(
-              color: AppColors.primary,
-              image:
-                  DecorationImage(image: AssetImage(AppImages.splashLogoGif))),
+            color: AppColors.primary,
+            image: DecorationImage(
+              image: AssetImage(AppImages.splashLogoGif),
+            ),
+          ),
         ),
       ),
     );

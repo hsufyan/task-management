@@ -137,51 +137,42 @@ class _CreateTaskState extends State<CreateTask> {
 
   }
 
-  void _onCreate() {
-    if (titleController.text.isNotEmpty &&
-        selectedStatusId != null &&
-        selectedID != null) {
-      context.read<TaskBloc>().add(TaskCreated(
-            title: titleController.text,
-            statusId: selectedStatusId ?? 0,
-            priorityId: selectedPriorityId ?? 0,
-            startDate: fromdate ?? "",
-            dueDate: todate ?? "",
-            desc: descController.text,
-            project: selectedID ?? 0,
-            userId: selectedusersNameId ?? [],
-            note: noteController.text,
-          ));
-      isLoading = true;
-      context.read<TaskBloc>().stream.listen((event) {
-        if (event is TaskCreateSuccess) {
-          if (mounted) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) =>
-                    const DashBoard(initialIndex: 2), // Navigate to index 1
-              ),
-            );
-            isLoading = false;
-            flutterToastCustom(
-                msg: AppLocalizations.of(context)!.createdsuccessfully,
-                color: AppColors.primary);
-            // Navigator.pop(context);
-          }
+ void _onCreate() {
+  if (titleController.text.isNotEmpty && selectedStatusId != null) {
+    context.read<TaskBloc>().add(TaskCreated(
+      title: titleController.text,
+      statusId: selectedStatusId ?? 0,
+      startDate: fromdate ?? "",
+      dueDate: todate ?? "",
+      desc: descController.text,
+      userId: selectedusersNameId ?? [],
+      note: noteController.text,
+    ));
+    isLoading = true;
+    context.read<TaskBloc>().stream.listen((event) {
+      if (event is TaskCreateSuccess) {
+        if (mounted) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const DashBoard(initialIndex: 2),
+            ),
+          );
+          isLoading = false;
+          flutterToastCustom(
+            msg: AppLocalizations.of(context)!.createdsuccessfully,
+            color: AppColors.primary,
+          );
         }
-        if (event is TaskCreateError) {
-          flutterToastCustom(msg: event.errorMessage);
-        }
-      });
-
-      // BlocProvider.of<TaskBloc>(context).add(TaskCreated(title: '',statusId:"",priorityId:"",startDate:"",dueDate:"",du, desc: '', project: null, userId: [], token: null, note: '');
-    } else {
-      flutterToastCustom(
-        msg: AppLocalizations.of(context)!.pleasefilltherequiredfield,
-      );
-    }
+      } else if (event is TaskCreateError) {
+        flutterToastCustom(msg: event.errorMessage);
+      }
+    });
+  } else {
+    flutterToastCustom(
+      msg: AppLocalizations.of(context)!.pleasefilltherequiredfield,
+    );
   }
-
+}
   void _onUpdateTask() {
     isLoading = true;
     context.read<TaskBloc>().add(UpdateTask(
@@ -445,26 +436,26 @@ class _CreateTaskState extends State<CreateTask> {
           onSelected: _handleStatusSelected,
         ),
         // StatusField(isLightTheme, Statusname, idStatus),
-        SizedBox(
-          height: 15.h,
-        ),
-        PriorityAllField(
-            priority: widget.priorityId,
-            isCreate: widget.isCreate!,
-            name: selectedPriority ?? "",
-            index: widget.index,
-            onSelected: _handlePrioritySelected),
-        SizedBox(
-          height: 15.h,
-        ),
-        ProjectField(
-          isRequired: true,
-          isCreate: widget.isCreate!,
-          project: widget.projectID != null ? widget.projectID! : 0,
-          name: selectedCategory ?? "",
-          index: widget.index!,
-          onSelected: _handleProjectSelected,
-        ),
+        // SizedBox(
+        //   height: 15.h,
+        // ),
+        // PriorityAllField(
+        //     priority: widget.priorityId,
+        //     isCreate: widget.isCreate!,
+        //     name: selectedPriority ?? "",
+        //     index: widget.index,
+        //     onSelected: _handlePrioritySelected),
+        // SizedBox(
+        //   height: 15.h,
+        // ),
+        // ProjectField(
+        //   isRequired: true,
+        //   isCreate: widget.isCreate!,
+        //   project: widget.projectID != null ? widget.projectID! : 0,
+        //   name: selectedCategory ?? "",
+        //   index: widget.index!,
+        //   onSelected: _handleProjectSelected,
+        // ),
 
         // PriorityField(isLightTheme, Priorityname,idPriority),
         SizedBox(
@@ -556,6 +547,7 @@ class _CreateTaskState extends State<CreateTask> {
           },
           onpressCreate: widget.isCreate == true
               ? () async {
+                print('tapped on create');
                   isPaginatedState == true ? _onCreate() : null;
                   // Navigator.pop(context);
                 }

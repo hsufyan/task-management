@@ -17,7 +17,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   bool _isLoading = false;
   TaskBloc() : super(TaskInitial()) {
     on<TaskCreated>(_createTask);
-    on<AllTaskList>(_allTask);
+   // on<AllTaskList>(_allTask);
     on<AllTaskListOnTask>(_allTaskListOnProject);
     on<TodaysTaskList>(_todaysTask);
     on<UpdateTask>(_updateTask);
@@ -34,11 +34,11 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       Map<String, dynamic> result = await TaskRepo().createTask(
           title: event.title,
           statusId: event.statusId,
-          priorityId: event.priorityId,
+        //  priorityId: event.priorityId,
           startDate: event.startDate,
           dueDate: event.dueDate,
           desc: event.desc,
-          project: event.project,
+         // project: event.project,
           note: event.note,
           userId: event.userId);
 
@@ -166,32 +166,32 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     }
   }
 
-  Future<void> _allTask(AllTaskList event, Emitter<TaskState> emit) async {
-    try {
-      List<Tasks> task = [];
-      _offset = 0; // Reset offset for the initial load
-      _hasReachedMax = false;
-      emit(TaskLoading());
-      Map<String, dynamic> result = await TaskRepo()
-          .getTask(limit: _limit, offset: _offset, search: '', token: true);
-      task = List<Tasks>.from(
-          result['data'].map((projectData) => Tasks.fromJson(projectData)));
+  // Future<void> _allTask(AllTaskList event, Emitter<TaskState> emit) async {
+  //   try {
+  //     List<Tasks> task = [];
+  //     _offset = 0; // Reset offset for the initial load
+  //     _hasReachedMax = false;
+  //     emit(TaskLoading());
+  //     Map<String, dynamic> result = await TaskRepo()
+  //         .getTask(limit: _limit, offset: _offset, search: '', token: true);
+  //     task = List<Tasks>.from(
+  //         result['data'].map((projectData) => Tasks.fromJson(projectData)));
 
-      _offset += _limit;
-      _hasReachedMax = task.length < _limit;
-      if (result['error'] == false) {
-        emit(TaskPaginated(task: task, hasReachedMax: _hasReachedMax));
-      }
-      if (result['error'] == true) {
-        emit((TaskError(result['message'])));
-      }
-    } on ApiException catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-      emit((TaskError("Error: $e")));
-    }
-  }
+  //     _offset += _limit;
+  //     _hasReachedMax = task.length < _limit;
+  //     if (result['error'] == false) {
+  //       emit(TaskPaginated(task: task, hasReachedMax: _hasReachedMax));
+  //     }
+  //     if (result['error'] == true) {
+  //       emit((TaskError(result['message'])));
+  //     }
+  //   } on ApiException catch (e) {
+  //     if (kDebugMode) {
+  //       print(e);
+  //     }
+  //     emit((TaskError("Error: $e")));
+  //   }
+  // }
 
   Future<void> _todaysTask(
       TodaysTaskList event, Emitter<TaskState> emit) async {
@@ -301,9 +301,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
             token: true,
             userId: event.userId,
             clientId: event.clientId,
-            projectId: event.projectId,
+          //  projectId: event.projectId,
             statusId: event.statusId,
-            priorityId: event.priorityId,
+          //  priorityId: event.priorityId,
             fromDate: event.fromDate,
             toDate: event.toDate,
             isFav: event.isFav);

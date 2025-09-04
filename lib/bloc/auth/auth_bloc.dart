@@ -58,7 +58,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           firstname: event.firstname!,
           lastname: event.lastname!,
           company: event.company!,
-          role: event.role!,
+          role: '2',
           conpassword: event.confirmPass!,
           type: event.type!);
       if (result['error'] == false) {

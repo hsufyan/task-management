@@ -15,7 +15,6 @@ import 'package:taskify/screens/widgets/no_data.dart';
 import 'package:taskify/screens/widgets/no_permission_screen.dart';
 import 'package:taskify/utils/widgets/custom_dimissible.dart';
 import 'package:taskify/utils/widgets/shake_widget.dart';
-import 'package:taskify/utils/widgets/back_arrow.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -35,8 +34,6 @@ import '../../../bloc/priority_multi/priority_multi_state.dart';
 import '../../../bloc/project_multi/project_multi_bloc.dart';
 import '../../../bloc/project_multi/project_multi_event.dart';
 import '../../../bloc/project_multi/project_multi_state.dart';
-import '../../../bloc/status/status_bloc.dart';
-import '../../../bloc/status/status_event.dart';
 import '../../../bloc/status_multi/status_multi_bloc.dart';
 import '../../../bloc/status_multi/status_multi_event.dart';
 import '../../../bloc/status_multi/status_multi_state.dart';
@@ -740,7 +737,7 @@ print("giruvfjkmcl, ${widget.taskId}");
                               clientId: clientSelectedIdS,
                               userId: userSelectedIdS,
                               statusId: statusSelectedIdS,
-                              priorityId: prioritySelectedIdS,
+                           //   priorityId: prioritySelectedIdS,
                               fromDate: fromDate,
                               toDate: toDate));
                         }
