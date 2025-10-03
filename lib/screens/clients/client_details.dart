@@ -498,7 +498,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                                 context.read<PermissionsBloc>().iseditProject ==
                                     true
                             ? detailMenu(
-                            isDiscuss:false,
+                         //   isDiscuss:false,
                              isEdit:    context.read<PermissionsBloc>().iseditProject,
                               isDelete : context.read<PermissionsBloc>().isdeleteProject,
                                key:  _key,

@@ -42,7 +42,7 @@ dependencies:
   shimmer: ^3.0.0
   flutter_quill: ^11.2.0
   flutter_switch: ^0.3.2
-  firebase_messaging: ^15.1.2
+  # firebase_messaging: ^15.1.2
   url_launcher: ^6.3.0
   timeline_tile: ^2.0.0
 
@@ -89,6 +89,8 @@ dependencies:
   go_router: ^14.8.0
   bloc: ^9.0.0
   flutter_glow: ^0.3.0
+  firebase_messaging: ^16.0.1
+  device_info_plus: ^12.1.0
 
 
 

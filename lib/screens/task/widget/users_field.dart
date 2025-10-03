@@ -27,6 +27,8 @@ class UsersField extends StatefulWidget {
   final List<int> usersid;
   final List<Tasks> project;
   final Function(List<String>, List<int>) onSelected;
+
+  final bool enabled;
   const UsersField(
       {super.key,
       usersField,
@@ -36,7 +38,7 @@ class UsersField extends StatefulWidget {
       this.isMeeting,
       required this.usersname,
       required this.project,
-
+this.enabled = true, // Add this line
       required this.onSelected});
 
   @override
@@ -124,7 +126,8 @@ class _UsersFieldState extends State<UsersField> {
           builder: (context, state) {
             if (state is UserInitial) {
               return AbsorbPointer(
-                absorbing: false,
+                absorbing: !widget.enabled,
+             //   absorbing: false,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -322,11 +325,9 @@ class _UsersFieldState extends State<UsersField> {
                                                             BoxDecoration(
                                                           // borderRadius: BorderRadius
                                                           //     .circular(15),
-                                                          color: isSelected
-                                                              ? AppColors
-                                                                  .primary
-                                                              : Colors.grey
-                                                                  .shade400,
+                                                        color: widget.enabled ? null : Colors.grey.withOpacity(0.2) 
+
+                                                        
                                                         ),
                                                         child: Row(
                                                           mainAxisAlignment:
@@ -559,221 +560,221 @@ class _UsersFieldState extends State<UsersField> {
                                       constraints:
                                           BoxConstraints(maxHeight: 900.h),
                                       width: MediaQuery.of(context).size.width,
-                                      child: BlocBuilder<UserBloc, UserState>(
-                                          builder: (context, state) {
+                                                  child: BlocBuilder<UserBloc, UserState>(
+                                                      builder: (context, state) {
 
-                                        if (state is UserPaginated) {
-                                          ScrollController scrollController =
-                                              ScrollController();
-                                          scrollController.addListener(() {
-                                            // !state.hasReachedMax
+                                                    if (state is UserPaginated) {
+                                                      ScrollController scrollController =
+                                                          ScrollController();
+                                                      scrollController.addListener(() {
+                                                        // !state.hasReachedMax
 
-                                            if (scrollController
-                                                .position.atEdge) {
+                                                        if (scrollController
+                                                            .position.atEdge) {
 
-                                              if (scrollController
-                                                      .position.pixels !=
-                                                  0) {
-                                                BlocProvider.of<UserBloc>(
-                                                        context)
-                                                    .add(UserLoadMore(
-                                                        searchWord));
-                                              }
-                                            }
-                                          });
-                                          return ListView.builder(
-                                              controller: scrollController,
-                                              shrinkWrap: true,
-                                              itemCount: state.hasReachedMax
-                                                  ? state.user.length
-                                                  : state.user.length + 1,
-                                              itemBuilder:
-                                                  (BuildContext context,
-                                                      int index) {
-                                                if (index < state.user.length) {
-                                                  // final isSelected =
-                                                  //     userSelectedId.contains(
-                                                  //             state.user[index]
-                                                  //                 .id!) ||
-                                                  //         userSelectedId
-                                                  //             .contains(userId);
-                                                  final isSelected =
-                                                      userSelectedId.contains(
-                                                          state
-                                                              .user[index].id!);
-                                                  // userSelectedId.addAll(widget.usersid);
-
-                                                  return Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 20.h),
-                                                    child: InkWell(
-                                                      splashColor:
-                                                          Colors.transparent,
-                                                      onTap: () {
-                                                        setState(() {
-                                                          final isSelected =
-                                                              userSelectedId
-                                                                  .contains(state
-                                                                      .user[
-                                                                          index]
-                                                                      .id!);
-
-                                                          if (isSelected) {
-                                                            // Remove the selected ID and corresponding username
-                                                            final removeIndex =
-                                                                userSelectedId
-                                                                    .indexOf(state
-                                                                        .user[
-                                                                            index]
-                                                                        .id!);
-                                                            userSelectedId
-                                                                .removeAt(
-                                                                    removeIndex);
-                                                            widget.usersid.removeAt(
-                                                                removeIndex); // Sync with widget.usersid
-                                                            userSelectedname
-                                                                .removeAt(
-                                                                    removeIndex); // Remove corresponding username
-
-
-                                                          } else {
-                                                            // Add the selected ID and corresponding username
-                                                            userSelectedId.add(
-                                                                state
-                                                                    .user[index]
-                                                                    .id!);
-                                                            widget.usersid.add(state
-                                                                .user[index]
-                                                                .id!); // Sync with widget.usersid
-                                                            userSelectedname
-                                                                .add(state
-                                                                    .user[index]
-                                                                    .firstName!); // Add corresponding username
-
+                                                          if (scrollController
+                                                                  .position.pixels !=
+                                                              0) {
+                                                            BlocProvider.of<UserBloc>(
+                                                                    context)
+                                                                .add(UserLoadMore(
+                                                                    searchWord));
+                                                          }
                                                         }
+                                                      });
+                                                      return ListView.builder(
+                                                          controller: scrollController,
+                                                          shrinkWrap: true,
+                                                          itemCount: state.hasReachedMax
+                                                              ? state.user.length
+                                                              : state.user.length + 1,
+                                                          itemBuilder:
+                                                              (BuildContext context,
+                                                                  int index) {
+                                                            if (index < state.user.length) {
+                                                              // final isSelected =
+                                                              //     userSelectedId.contains(
+                                                              //             state.user[index]
+                                                              //                 .id!) ||
+                                                              //         userSelectedId
+                                                              //             .contains(userId);
+                                                              final isSelected =
+                                                                  userSelectedId.contains(
+                                                                      state
+                                                                          .user[index].id!);
+                                                              // userSelectedId.addAll(widget.usersid);
 
-                                                          // Trigger any necessary UI or Bloc updates
-                                                          widget.onSelected(
-                                                              userSelectedname,
-                                                              userSelectedId);
-                                                          BlocProvider.of<
-                                                                      UserBloc>(
-                                                                  context)
-                                                              .add(SelectedUser(
-                                                                  index,
-                                                                  state
-                                                                      .user[
-                                                                          index]
-                                                                      .firstName!));
-                                                          BlocProvider.of<
-                                                                      UserBloc>(
-                                                                  context)
-                                                              .add(ToggleUserSelection(
-                                                                  index,
-                                                                  state
-                                                                      .user[
-                                                                          index]
-                                                                      .firstName!));
-                                                        });
-                                                      },
-                                                      child: Padding(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                            vertical: 2.h,
-                                                          ),
-                                                          child: Container(
-                                                            decoration: BoxDecoration(
-                                                                color: isSelected
-                                                                    ? AppColors
-                                                                        .purpleShade
-                                                                    : Colors
-                                                                        .transparent,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            10),
-                                                                border: Border.all(
-                                                                    color: isSelected
-                                                                        ? AppColors
-                                                                            .purple
-                                                                        : Colors
-                                                                            .transparent)),
-                                                            width:
-                                                                double.infinity,
-                                                            height: 40.h,
-                                                            child: Center(
-                                                              child: Padding(
-                                                                padding: EdgeInsets
-                                                                    .symmetric(
-                                                                        horizontal:
-                                                                            10.w),
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
-                                                                  children: [
-                                                                    Expanded(
-                                                                      flex: 4,
-                                                                      child:
-                                                                          SizedBox(
-                                                                        width:
-                                                                            200.w,
-                                                                        child:
-                                                                            CustomText(
-                                                                          text: state
-                                                                              .user[index]
-                                                                              .firstName!,
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                          maxLines:
-                                                                              1,
-                                                                          overflow:
-                                                                              TextOverflow.ellipsis,
-                                                                          size:
-                                                                              18.sp,
-                                                                          color: isSelected
-                                                                              ? AppColors.primary
-                                                                              : Theme.of(context).colorScheme.textClrChange,
-                                                                        ),
+                                                              return Padding(
+                                                                padding:
+                                                                    EdgeInsets.symmetric(
+                                                                        horizontal: 20.h),
+                                                                child: InkWell(
+                                                                  splashColor:
+                                                                      Colors.transparent,
+                                                                  onTap: () {
+                                                                    setState(() {
+                                                                      final isSelected =
+                                                                          userSelectedId
+                                                                              .contains(state
+                                                                                  .user[
+                                                                                      index]
+                                                                                  .id!);
+
+                                                                      if (isSelected) {
+                                                                        // Remove the selected ID and corresponding username
+                                                                        final removeIndex =
+                                                                            userSelectedId
+                                                                                .indexOf(state
+                                                                                    .user[
+                                                                                        index]
+                                                                                    .id!);
+                                                                        userSelectedId
+                                                                            .removeAt(
+                                                                                removeIndex);
+                                                                        widget.usersid.removeAt(
+                                                                            removeIndex); // Sync with widget.usersid
+                                                                        userSelectedname
+                                                                            .removeAt(
+                                                                                removeIndex); // Remove corresponding username
+
+
+                                                                      } else {
+                                                                        // Add the selected ID and corresponding username
+                                                                        userSelectedId.add(
+                                                                            state
+                                                                                .user[index]
+                                                                                .id!);
+                                                                        widget.usersid.add(state
+                                                                            .user[index]
+                                                                            .id!); // Sync with widget.usersid
+                                                                        userSelectedname
+                                                                            .add(state
+                                                                                .user[index]
+                                                                                .firstName!); // Add corresponding username
+
+                                                                    }
+
+                                                                      // Trigger any necessary UI or Bloc updates
+                                                                      widget.onSelected(
+                                                                          userSelectedname,
+                                                                          userSelectedId);
+                                                                      BlocProvider.of<
+                                                                                  UserBloc>(
+                                                                              context)
+                                                                          .add(SelectedUser(
+                                                                              index,
+                                                                              state
+                                                                                  .user[
+                                                                                      index]
+                                                                                  .firstName!));
+                                                                      BlocProvider.of<
+                                                                                  UserBloc>(
+                                                                              context)
+                                                                          .add(ToggleUserSelection(
+                                                                              index,
+                                                                              state
+                                                                                  .user[
+                                                                                      index]
+                                                                                  .firstName!));
+                                                                    });
+                                                                  },
+                                                                  child: Padding(
+                                                                      padding: EdgeInsets
+                                                                          .symmetric(
+                                                                        vertical: 2.h,
                                                                       ),
-                                                                    ),
-                                                                    isSelected
-                                                                        ? Expanded(
-                                                                            flex:
-                                                                                1,
-                                                                            child: const HeroIcon(HeroIcons.checkCircle,
-                                                                                style: HeroIconStyle.solid,
-                                                                                color: AppColors.purple),
-                                                                          )
-                                                                        : const SizedBox
-                                                                            .shrink(),
-                                                                  ],
+                                                                      child: Container(
+                                                                        decoration: BoxDecoration(
+                                                                            color: isSelected
+                                                                                ? AppColors
+                                                                                    .purpleShade
+                                                                                : Colors
+                                                                                    .transparent,
+                                                                            borderRadius:
+                                                                                BorderRadius
+                                                                                    .circular(
+                                                                                        10),
+                                                                            border: Border.all(
+                                                                                color: isSelected
+                                                                                    ? AppColors
+                                                                                        .purple
+                                                                                    : Colors
+                                                                                        .transparent)),
+                                                                        width:
+                                                                            double.infinity,
+                                                                        height: 40.h,
+                                                                        child: Center(
+                                                                          child: Padding(
+                                                                            padding: EdgeInsets
+                                                                                .symmetric(
+                                                                                    horizontal:
+                                                                                        10.w),
+                                                                            child: Row(
+                                                                              mainAxisAlignment:
+                                                                                  MainAxisAlignment
+                                                                                      .spaceBetween,
+                                                                              children: [
+                                                                                Expanded(
+                                                                                  flex: 4,
+                                                                                  child:
+                                                                                      SizedBox(
+                                                                                    width:
+                                                                                        200.w,
+                                                                                    child:
+                                                                                        CustomText(
+                                                                                      text: state
+                                                                                          .user[index]
+                                                                                          .firstName!,
+                                                                                      fontWeight:
+                                                                                          FontWeight.w500,
+                                                                                      maxLines:
+                                                                                          1,
+                                                                                      overflow:
+                                                                                          TextOverflow.ellipsis,
+                                                                                      size:
+                                                                                          18.sp,
+                                                                                      color: isSelected
+                                                                                          ? AppColors.primary
+                                                                                          : Theme.of(context).colorScheme.textClrChange,
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                                isSelected
+                                                                                    ? Expanded(
+                                                                                        flex:
+                                                                                            1,
+                                                                                        child: const HeroIcon(HeroIcons.checkCircle,
+                                                                                            style: HeroIconStyle.solid,
+                                                                                            color: AppColors.purple),
+                                                                                      )
+                                                                                    : const SizedBox
+                                                                                        .shrink(),
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      )),
                                                                 ),
-                                                              ),
-                                                            ),
-                                                          )),
-                                                    ),
-                                                  );
-                                                } else {
-                                                  return Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(vertical: 0),
-                                                    child: Center(
-                                                      child: state.hasReachedMax
-                                                          ? const Text('')
-                                                          : const SpinKitFadingCircle(
-                                                              color: AppColors
-                                                                  .primary,
-                                                              size: 40.0,
-                                                            ),
-                                                    ),
-                                                  );
-                                                }
-                                              });
-                                        }
-                                        return Container();
-                                      }),
+                                                              );
+                                                            } else {
+                                                              return Padding(
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(vertical: 0),
+                                                                child: Center(
+                                                                  child: state.hasReachedMax
+                                                                      ? const Text('')
+                                                                      : const SpinKitFadingCircle(
+                                                                          color: AppColors
+                                                                              .primary,
+                                                                          size: 40.0,
+                                                                        ),
+                                                                ),
+                                                              );
+                                                            }
+                                                          });
+                                                    }
+                                                    return Container();
+                                                  }),
                                     ),
                                     actions: <Widget>[
                                       Padding(

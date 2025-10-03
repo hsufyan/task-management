@@ -6,7 +6,10 @@ import 'package:taskify/config/colors.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:taskify/utils/widgets/custom_text.dart';
 
-Widget detailMenu({required isEdit,required isDiscuss,required isDelete, required key, required context,
+Widget detailMenu({required isEdit,required
+// isDiscuss,required 
+
+isDelete, required key, required context,
   required onpressEdit, required onpressDelete, onpressdiscuss}) {
   return ExpandableFab(
     key: key,
@@ -41,9 +44,9 @@ Widget detailMenu({required isEdit,required isDiscuss,required isDelete, require
       },
     ),
     // openCloseStackAlignment: Alignment.bottomRight, // Align at the bottom-right
-     distance: isDiscuss ?80.w:60.w, // Distance from the main FAB to its children
+    // distance: isDiscuss ?80.w:60.w, // Distance from the main FAB to its children
      // type: ExpandableFabType.fan,
-    type: !isDiscuss ?ExpandableFabType.up:ExpandableFabType.fan,
+   // type: !isDiscuss ?ExpandableFabType.up:ExpandableFabType.fan,
      fanAngle: 100,
     overlayStyle: ExpandableFabOverlayStyle(
       color: Colors.black.withValues(alpha:0.5),
@@ -86,21 +89,21 @@ Widget detailMenu({required isEdit,required isDiscuss,required isDelete, require
               ),
             )
           : SizedBox.shrink(),
-      isDiscuss == true  ?FloatingActionButton.small(
-        tooltip: AppLocalizations.of(context)!.deleteProj,
-        backgroundColor: AppColors.mileStoneBgColor,
-        heroTag: CustomText(
-          text: AppLocalizations.of(context)!.deleteProj,
-          color: Theme.of(context).colorScheme.textClrChange,
-        ),
-        onPressed: onpressdiscuss,
-        child: HeroIcon(
-          HeroIcons.ellipsisHorizontal,
-          style: HeroIconStyle.solid,
-          color: AppColors.mileStoneColor,
-          size: 20.sp,
-        ),
-      ):SizedBox()
+      // isDiscuss == true  ?FloatingActionButton.small(
+      //   tooltip: AppLocalizations.of(context)!.deleteProj,
+      //   backgroundColor: AppColors.mileStoneBgColor,
+      //   heroTag: CustomText(
+      //     text: AppLocalizations.of(context)!.deleteProj,
+      //     color: Theme.of(context).colorScheme.textClrChange,
+      //   ),
+      //   onPressed: onpressdiscuss,
+      //   child: HeroIcon(
+      //     HeroIcons.ellipsisHorizontal,
+      //     style: HeroIconStyle.solid,
+      //     color: AppColors.mileStoneColor,
+      //     size: 20.sp,
+      //   ),
+      // ):SizedBox()
 
       // isDelete == true
       //     ? FloatingActionButton.small(

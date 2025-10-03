@@ -284,7 +284,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                       true ||
                   context.read<PermissionsBloc>().iseditProject == true
               ? detailMenu(
-              isDiscuss:true,
+            //  isDiscuss:true,
                   isEdit: context.read<PermissionsBloc>().iseditProject,
                   isDelete: context.read<PermissionsBloc>().isdeleteProject,
                   key: _key,

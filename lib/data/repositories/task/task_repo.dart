@@ -124,7 +124,8 @@ Future<Map<String, dynamic>> getTask({
         );
       } else if (id != null) {
         response = await ApiBaseHelper.getApi(
-          url: "$getAllTaskUrl?user_ids[]=$id",
+        url: "$getAllTaskUrl?user_ids[]=${userId!.first}",
+
           useAuthToken: token,
           params: body,
         );
@@ -145,7 +146,8 @@ Future<Map<String, dynamic>> getTask({
         );
       } else if (id != null) {
         response = await ApiBaseHelper.getApi(
-          url: "$getAllTaskUrl?user_ids[]=$id",
+         url: "$getAllTaskUrl?user_ids[]=${userId!.first}",
+
           useAuthToken: token,
           params: {},
         );
@@ -229,7 +231,7 @@ Future<Map<String, dynamic>> getTask({
     required int id,
     required String title,
     required int statusId,
-    required int priorityId,
+    // required int priorityId,
     required String startDate,
     required String dueDate,
     required String desc,
@@ -243,7 +245,7 @@ Future<Map<String, dynamic>> getTask({
         "id": id,
         "title": title,
         "status_id": statusId,
-        "priority_id": priorityId,
+        // "priority_id": priorityId,
         "start_date": startDate,
         "due_date": dueDate,
         "description": desc,
@@ -253,7 +255,7 @@ Future<Map<String, dynamic>> getTask({
       final response = await ApiBaseHelper.post(
           url: updateTaskUrl, useAuthToken: true, body: body);
       print("ertyguhnjmk,l");
-      print("xdctfvgybhnjmk,l $response");
+      print("ye response hai, $response");
       // rows = response['data']['data'] as Map<String, dynamic>;
 
       return response;

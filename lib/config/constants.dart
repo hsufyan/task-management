@@ -7,7 +7,7 @@ import 'package:taskify/bloc/setting/settings_bloc.dart';
 
 
 const String appName = 'Taskify!';
-const String baseUrl = 'http://192.168.1.22:8000/api/';
+const String baseUrl = 'http://192.168.1.25:8000/api/';
 
 // /com.example.taskify
 

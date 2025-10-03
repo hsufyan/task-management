@@ -226,20 +226,22 @@ class _AllTaskScreenState extends State<AllTaskScreen>
   }
 
   void _initializeBlocs() {
-    context.read<FilterCountBloc>().add(ProjectResetFilterCount());
-    context.read<TaskFilterCountBloc>().add(TaskResetFilterCount());
-    BlocProvider.of<PermissionsBloc>(context).add(GetPermissions());
-    BlocProvider.of<DashBoardStatsBloc>(context).add(StatsList());
-    statusPending = context.read<LeaveRequestBloc>().statusPending;
-    context.read<DashBoardStatsBloc>().totalTodos.toString();
-    context.read<DashBoardStatsBloc>().totalProject.toString();
-    context.read<DashBoardStatsBloc>().totalTask.toString();
-    context.read<DashBoardStatsBloc>().totaluser.toString();
-    context.read<DashBoardStatsBloc>().totalClient.toString();
-    context.read<DashBoardStatsBloc>().totalMeeting.toString();
-    BlocProvider.of<WorkspaceBloc>(context).add(const WorkspaceList());
-    BlocProvider.of<ProjectBloc>(context).add(ProjectDashBoardList());
-    BlocProvider.of<NotificationBloc>(context).add(UnreadNotificationCount());
+   // context.read<FilterCountBloc>().add(ProjectResetFilterCount());
+     context.read<TaskFilterCountBloc>().add(TaskResetFilterCount());
+      photoWidget = context.read<UserProfileBloc>().profilePic;
+    context.read<UserProfileBloc>().add(ProfileListGet());
+    // BlocProvider.of<PermissionsBloc>(context).add(GetPermissions());
+    // BlocProvider.of<DashBoardStatsBloc>(context).add(StatsList());
+    // statusPending = context.read<LeaveRequestBloc>().statusPending;
+    // context.read<DashBoardStatsBloc>().totalTodos.toString();
+    // context.read<DashBoardStatsBloc>().totalProject.toString();
+    // context.read<DashBoardStatsBloc>().totalTask.toString();
+    // context.read<DashBoardStatsBloc>().totaluser.toString();
+    // context.read<DashBoardStatsBloc>().totalClient.toString();
+    // context.read<DashBoardStatsBloc>().totalMeeting.toString();
+    // BlocProvider.of<WorkspaceBloc>(context).add(const WorkspaceList());
+    // BlocProvider.of<ProjectBloc>(context).add(ProjectDashBoardList());
+    // BlocProvider.of<NotificationBloc>(context).add(UnreadNotificationCount());
     BlocProvider.of<TaskBloc>(context).add(AllTaskListOnTask());
   }
 
@@ -387,10 +389,525 @@ class _AllTaskScreenState extends State<AllTaskScreen>
 
   void onDeleteTask(Tasks task) {
     print("[DEBUG] Triggering DeleteTask for task ID: ${task.id}");
-    //  context.read<TaskBloc>().add(DeleteTask(task));
+    context.read<TaskBloc>().add(DeleteTask(task.id!));
   }
 
-  void onEditTask(Tasks task) {
+ 
+ 
+  Future<void> _onRefresh() async {
+    BlocProvider.of<TaskBloc>(context).add(AllTaskListOnTask());
+    return Future.delayed(const Duration(milliseconds: 500));
+  }
+
+ Widget _listOfProject(Tasks task, bool isLightTheme, String? date,
+    List<Tasks> statetask, int index) {
+  print(
+      "[DEBUG] Rendering task ID: ${task.id}, title: ${task.title}, users: ${task.users}, clients: ${task.clients}, pinned: ${task.pinned}, favorite: ${task.favorite}, statusId: ${task.statusId}");
+  return Padding(
+    padding: EdgeInsets.symmetric(vertical: 10.h),
+    child: DismissibleCard(
+      direction: role == 'admin'
+          ? DismissDirection.horizontal
+          : DismissDirection.none,
+      title: task.id.toString(),
+      confirmDismiss: (DismissDirection direction) async {
+        print(
+            "[DEBUG] Dismiss direction: $direction for task ID: ${task.id}");
+        if (direction == DismissDirection.endToStart && role == 'admin') {
+          final result = await showDialog<bool>(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r)),
+                backgroundColor:
+                    Theme.of(context).colorScheme.alertBoxBackGroundColor,
+                title: Text(AppLocalizations.of(context)!.confirmDelete),
+                content: Text(AppLocalizations.of(context)!.areyousure),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: Text(AppLocalizations.of(context)!.delete),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: Text(AppLocalizations.of(context)!.cancel),
+                  ),
+                ],
+              );
+            },
+          );
+          return result ?? false;
+        } else if (direction == DismissDirection.startToEnd &&
+            role == 'admin') {
+          onEditTask(task);
+          return false;
+        }
+        return false;
+      },
+      onDismissed: (DismissDirection direction) {
+        print(
+            "[DEBUG] onDismissed triggered for task ${task.id}, direction: $direction");
+        if (direction == DismissDirection.endToStart && role == 'admin') {
+          print("[DEBUG] Deleting task ${task.id}");
+          onDeleteTask(task);
+        }
+      },
+      dismissWidget: InkWell(
+        highlightColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        onTap: () {
+          print(
+              "[DEBUG] onTap triggered for task ID: ${task.id}, title: ${task.title}");
+          print("[DEBUG] Router: $router, Context: $context");
+          router.push(
+            '/taskdetail',
+            extra: {
+              "task": task, // Pass the entire Tasks object
+              "from": "dashboard",
+            },
+          ).then((_) {
+            print("[DEBUG] Navigation to /taskdetail completed");
+          }).catchError((error) {
+            print("[DEBUG] Navigation error: $error");
+          });
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              isLightTheme
+                  ? MyThemes.lightThemeShadow
+                  : MyThemes.darkThemeShadow,
+            ],
+            color: Theme.of(context).colorScheme.containerDark,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 20.h, left: 20.h, right: 20.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              CustomText(
+                                text: "#${task.id.toString()}",
+                                size: 14.sp,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .textClrChange,
+                                fontWeight: FontWeight.w700,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                          CustomText(
+                            text: task.title ?? 'Untitled',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            size: 24.sp,
+                            color: Theme.of(context).colorScheme.textClrChange,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          task.description != null
+                              ? SizedBox(height: 8.h)
+                              : const SizedBox.shrink(),
+                          task.description != null
+                              ? SizedBox(
+                                  width: double.infinity,
+                                  child: htmlWidget(
+                                      task.description!, context,
+                                      width: 290.w, height: 36.h),
+                                )
+                              : const SizedBox.shrink(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.h),
+                child: statusClientRow(
+                    task.status ?? 'Unknown', task.priority, context, isLightTheme),
+              ),
+              (task.users?.isEmpty ?? true) && (task.clients?.isEmpty ?? true)
+                  ? const SizedBox.shrink()
+                  : Padding(
+                      padding:
+                          EdgeInsets.only(top: 10.h, left: 18.w, right: 18.w),
+                      child: SizedBox(
+                        height: 60.h,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {
+                                  print(
+                                      "[DEBUG] Showing user dialog for task ${task.id}");
+                                  userClientDialog(
+                                    from: "user",
+                                    context: context,
+                                    title: AppLocalizations.of(context)!.allusers,
+                                    list: task.users ?? [],
+                                  );
+                                },
+                                child: RowDashboard(
+                                    list: task.users ?? [], title: "user"),
+                              ),
+                            ),
+                            task.users?.isEmpty ?? true
+                                ? const SizedBox.shrink()
+                                : SizedBox(width: 20.w),
+                            task.clients?.isEmpty ?? true
+                                ? const SizedBox.shrink()
+                                : Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        print(
+                                            "[DEBUG] Showing client dialog for task ${task.id}");
+                                        userClientDialog(
+                                          from: 'client',
+                                          context: context,
+                                          title: task.clients?.isNotEmpty ?? false
+                                              ? AppLocalizations.of(context)!
+                                                  .allclients
+                                              : AppLocalizations.of(context)!
+                                                  .allclients,
+                                          list: task.clients ?? [],
+                                        );
+                                      },
+                                      child: RowDashboard(
+                                          list: task.clients ?? [],
+                                          title: "client"),
+                                    ),
+                                  ),
+                          ],
+                        ),
+                      ),
+                    ),
+              Divider(color: Theme.of(context).colorScheme.dividerClrChange),
+              Padding(
+                padding:
+                    EdgeInsets.only(bottom: 10.h, left: 20.h, right: 20.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const HeroIcon(HeroIcons.calendar,
+                            style: HeroIconStyle.solid,
+                            color: AppColors.blueColor),
+                        SizedBox(width: 20.w),
+                        CustomText(
+                            text: date ?? "",
+                            color: AppColors.greyColor,
+                            size: 12,
+                            fontWeight: FontWeight.w500),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+   @override
+  Widget build(BuildContext context) {
+    final themeBloc = context.read<ThemeBloc>();
+    final currentTheme = themeBloc.currentThemeState;
+    bool isLightTheme = currentTheme is LightThemeState;
+
+    return Scaffold(
+      key: _scaffoldKey,
+      drawer: isExpand ? _drawerIn() : _expandedDrawer(),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(40.h),
+        child: AppBar(
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: isLightTheme ? Colors.transparent : Colors.black,
+            statusBarIconBrightness:
+                isLightTheme ? Brightness.dark : Brightness.light,
+            statusBarBrightness:
+                isLightTheme ? Brightness.light : Brightness.dark,
+          ),
+          backgroundColor: Colors.transparent,
+          leadingWidth: 50.w,
+          leading: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 0.w),
+            child: GestureDetector(
+              onTap: () => _scaffoldKey.currentState?.openDrawer(),
+              child: SizedBox(
+                width: 50.w,
+                height: 30.h,
+                child: HeroIcon(
+                  HeroIcons.bars3BottomLeft,
+                  style: HeroIconStyle.outline,
+                  size: 20.sp,
+                  color: Theme.of(context).colorScheme.textClrChange,
+                ),
+              ),
+            ),
+          ),
+          // actions: [
+          //   Padding(
+          //     padding: EdgeInsets.symmetric(horizontal: 18.w),
+          //     child: Row(
+          //       children: [
+          //         Stack(
+          //           children: [
+          //             GestureDetector(
+          //               onTap: () => router.push("/notification"),
+          //               child: SizedBox(
+          //                 height: 50.h,
+          //                 child: Padding(
+          //                   padding: EdgeInsets.only(left: 5.w, right: 10.w),
+          //                   child: HeroIcon(
+          //                     HeroIcons.bell,
+          //                     style: HeroIconStyle.outline,
+          //                     size: 20.sp,
+          //                     color:
+          //                         Theme.of(context).colorScheme.textClrChange,
+          //                   ),
+          //                 ),
+          //               ),
+          //             ),
+          //             Positioned(
+          //               right: 5.w,
+          //               top: 2.h,
+          //               child:
+          //                   BlocConsumer<NotificationBloc, NotificationsState>(
+          //                 listener: (context, state) {
+          //                   if (state is NotificationPaginated) {}
+          //                 },
+          //                 builder: (context, state) {
+          //                   print(
+          //                       "[DEBUG] Notification state: $state, totalUnreadCount: ${context.read<NotificationBloc>().totalUnreadCount}");
+          //                   if (state is UnreadNotification) {
+          //                     return state.total == 0
+          //                         ? const SizedBox()
+          //                         : Container(
+          //                             height: 15.sp,
+          //                             width: 15.sp,
+          //                             decoration: BoxDecoration(
+          //                                 shape: BoxShape.circle,
+          //                                 color: Colors.yellow.shade800),
+          //                             child: Center(
+          //                               child: CustomText(
+          //                                 size: 10,
+          //                                 fontWeight: FontWeight.w600,
+          //                                 text: state.total.toString(),
+          //                                 color: AppColors.pureWhiteColor,
+          //                               ),
+          //                             ),
+          //                           );
+          //                   }
+          //                   return const SizedBox();
+          //                 },
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //         GestureDetector(
+          //           onTap: () => _showLanguageDialog(context),
+          //           child: SizedBox(
+          //             height: 50.h,
+          //             child: Padding(
+          //               padding: EdgeInsets.only(left: 5.w, right: 5.w),
+          //               child: HeroIcon(
+          //                 HeroIcons.language,
+          //                 style: HeroIconStyle.outline,
+          //                 size: 20.sp,
+          //                 color: Theme.of(context).colorScheme.textClrChange,
+          //               ),
+          //             ),
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ],
+      
+        ),
+      ),
+      floatingActionButton: role == 'admin'
+          ? Padding(
+              padding: EdgeInsets.only(bottom: 60.h),
+              child: FloatingActionButton(
+                isExtended: true,
+                onPressed: () {
+                  print("[DEBUG] FAB tapped, navigating to /createtask");
+                  BlocProvider.of<UserBloc>(context).add(UserList());
+                  BlocProvider.of<StatusBloc>(context).add(StatusList());
+                  router.push('/createtask', extra: {
+                    "id": 0,
+                    "isCreate": true,
+                    "title": "",
+                    "desc": "",
+                    "start": "",
+                    "end": "",
+                    "users": <String>[], // Empty list of usernames
+                    "usersid": <int>[], // Empty list of user IDs
+                    "priorityId": 0,
+                    "statusId": 0,
+                    "note": "",
+                    "project": "",
+                    "userList": <dynamic>[], // Empty list for user objects
+                    "status": "",
+                    "req":
+                        <CreateTaskModel>[], // Placeholder, assumed to be defined
+                  });
+                },
+                backgroundColor: AppColors.primary,
+                child: const Icon(Icons.add, color: AppColors.whiteColor),
+              ),
+            )
+          : const SizedBox(),
+      backgroundColor: Theme.of(context).colorScheme.backGroundColor,
+      body: Column(
+        children: [
+          SizedBox(height: 20.h),
+          CustomSearchField(
+            isLightTheme: isLightTheme,
+            controller: searchController,
+            suffixIcon: SizedBox(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (searchController.text.isNotEmpty)
+                    SizedBox(
+                      width: 20.w,
+                      child: IconButton(
+                        highlightColor: Colors.transparent,
+                        padding: EdgeInsets.zero,
+                        icon: Icon(
+                          Icons.clear,
+                          size: 20.sp,
+                          color: Theme.of(context).colorScheme.textFieldColor,
+                        ),
+                        onPressed: () {
+                          searchController.clear();
+                          context.read<TaskBloc>().add(SearchTasks(""));
+                        },
+                      ),
+                    ),
+                  // SizedBox(
+                  //   width: 30.w,
+                  //   child: IconButton(
+                  //     icon: Icon(
+                  //       _speechToText.isNotListening
+                  //           ? Icons.mic_off
+                  //           : Icons.mic,
+                  //       size: 20.sp,
+                  //       color: Theme.of(context).colorScheme.textFieldColor,
+                  //     ),
+                  //     onPressed: () {
+                  //       if (_speechToText.isNotListening) {
+                  //         _startListening();
+                  //       } else {
+                  //         _stopListening();
+                  //       }
+                  //     },
+                  //   ),
+                  // ),
+         
+                  // BlocBuilder<TaskFilterCountBloc, TaskFilterCountState>(
+                  //   builder: (context, state) {
+                  //     return SizedBox(
+                  //       width: 35.w,
+                  //       child: Stack(
+                  //         children: [
+                  //           IconButton(
+                  //             icon: HeroIcon(
+                  //               HeroIcons.adjustmentsHorizontal,
+                  //               style: HeroIconStyle.solid,
+                  //               color: Theme.of(context)
+                  //                   .colorScheme
+                  //                   .textFieldColor,
+                  //               size: 30.sp,
+                  //             ),
+                  //             onPressed: () {
+                  //               BlocProvider.of<ClientBloc>(context)
+                  //                   .add(ClientList());
+                  //               BlocProvider.of<StatusMultiBloc>(context)
+                  //                   .add(StatusMultiList());
+                  //               BlocProvider.of<PriorityMultiBloc>(context)
+                  //                   .add(PriorityMultiList());
+                  //               BlocProvider.of<ProjectMultiBloc>(context)
+                  //                   .add(ProjectMultiList());
+                  //               BlocProvider.of<UserBloc>(context)
+                  //                   .add(UserList());
+                  //               _filterDialog(context, isLightTheme);
+                  //             },
+                  //           ),
+                  //           if (state.count > 0)
+                  //             Positioned(
+                  //               right: 5.w,
+                  //               top: 7.h,
+                  //               child: Container(
+                  //                 padding: EdgeInsets.zero,
+                  //                 alignment: Alignment.center,
+                  //                 height: 12.h,
+                  //                 width: 10.w,
+                  //                 decoration: const BoxDecoration(
+                  //                   color: AppColors.primary,
+                  //                   shape: BoxShape.circle,
+                  //                 ),
+                  //                 child: CustomText(
+                  //                   text: state.count.toString(),
+                  //                   color: Colors.white,
+                  //                   size: 6,
+                  //                   textAlign: TextAlign.center,
+                  //                   fontWeight: FontWeight.bold,
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //         ],
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
+                
+                ],
+              ),
+            ),
+            onChanged: (value) {
+              searchword = value;
+              context.read<TaskBloc>().add(SearchTasks(value));
+            },
+          ),
+          SizedBox(height: 20.h),
+          _taskBlocList(isLightTheme),
+          SizedBox(height: 60.h),
+        ],
+      ),
+    );
+  }
+
+  void soundLevelListener(double level) {
+    minSoundLevel = min(minSoundLevel, level);
+    maxSoundLevel = max(maxSoundLevel, level);
+    setState(() {
+      this.level = level;
+    });
+  }
+
+
+ void onEditTask(Tasks task) {
     List<String> username = [];
     List<int> ids = [];
     if (task.users != null) {
@@ -422,7 +939,8 @@ class _AllTaskScreenState extends State<AllTaskScreen>
     );
   }
 
-  void _showLanguageDialog(BuildContext context) {
+
+ void _showLanguageDialog(BuildContext context) {
     String? selectedLanguage =
         context.read<LanguageBloc>().state.locale.languageCode;
     showDialog(
@@ -543,350 +1061,8 @@ class _AllTaskScreenState extends State<AllTaskScreen>
     );
   }
 
-  Future<void> _onRefresh() async {
-    BlocProvider.of<TaskBloc>(context).add(AllTaskListOnTask());
-    return Future.delayed(const Duration(milliseconds: 500));
-  }
 
-  Widget _listOfProject(Tasks task, bool isLightTheme, String? date,
-      List<Tasks> statetask, int index) {
-    print(
-        "[DEBUG] Rendering task ID: ${task.id}, title: ${task.title}, users: ${task.users}, clients: ${task.clients}, pinned: ${task.pinned}, favorite: ${task.favorite}, statusId: ${task.statusId}");
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10.h),
-      child: DismissibleCard(
-        direction: role == 'admin'
-            ? DismissDirection.horizontal
-            : DismissDirection.none,
-        title: task.id.toString(),
-        confirmDismiss: (DismissDirection direction) async {
-          print(
-              "[DEBUG] Dismiss direction: $direction for task ID: ${task.id}");
-          if (direction == DismissDirection.endToStart && role == 'admin') {
-            final result = await showDialog<bool>(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.r)),
-                  backgroundColor:
-                      Theme.of(context).colorScheme.alertBoxBackGroundColor,
-                  title: Text(AppLocalizations.of(context)!.confirmDelete),
-                  content: Text(AppLocalizations.of(context)!.areyousure),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: Text(AppLocalizations.of(context)!.delete),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: Text(AppLocalizations.of(context)!.cancel),
-                    ),
-                  ],
-                );
-              },
-            );
-            return result ?? false;
-          } else if (direction == DismissDirection.startToEnd &&
-              role == 'admin') {
-            onEditTask(task);
-            return false;
-          }
-          return false;
-        },
-        onDismissed: (DismissDirection direction) {
-          print(
-              "[DEBUG] onDismissed triggered for task ${task.id}, direction: $direction");
-          if (direction == DismissDirection.endToStart && role == 'admin') {
-            print("[DEBUG] Deleting task ${task.id}");
-            onDeleteTask(task);
-          }
-        },
-        dismissWidget: InkWell(
-          highlightColor: Colors.transparent,
-          splashColor: Colors.transparent,
-          onTap: () {
-            List<String> username = [];
-            if (task.users != null) {
-              for (var names in task.users!) {
-                username.add(names.firstName ?? 'Unknown');
-              }
-            }
-            print(
-                "[DEBUG] onTap triggered for task ID: ${task.id}, username: $username");
-            print("[DEBUG] Router: $router, Context: $context");
-            router.push(
-              '/taskdetail',
-              extra: {
-                "id": task.id,
-                "from": "dashboard",
-              },
-            ).then((_) {
-              print("[DEBUG] Navigation to /taskdetail completed");
-            }).catchError((error) {
-              print("[DEBUG] Navigation error: $error");
-            });
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                isLightTheme
-                    ? MyThemes.lightThemeShadow
-                    : MyThemes.darkThemeShadow,
-              ],
-              color: Theme.of(context).colorScheme.containerDark,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(top: 20.h, left: 20.h, right: 20.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                CustomText(
-                                  text: "#${task.id.toString()}",
-                                  size: 14.sp,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .textClrChange,
-                                  fontWeight: FontWeight.w700,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                // Row(
-                                //   children: [
-                                //     InkWell(
-                                //       onTap: () {
-                                //         setState(() {
-                                //           task.pinned =
-                                //               task.pinned == 1 ? 0 : 1;
-                                //           print(
-                                //               "[DEBUG] Updating pinned status for task ${task.id}: ${task.pinned}");
-                                //           TaskRepo().updateTaskPinned(
-                                //               id: task.id ?? 0,
-                                //               isPinned: task.pinned ?? 0);
-                                //         });
-                                //         _pinnedcController.reverse().then(
-                                //             (value) =>
-                                //                 _pinnedcController.forward());
-                                //       },
-                                //       child: Container(
-                                //         width: 40.w,
-                                //         height: 30.h,
-                                //         decoration: BoxDecoration(
-                                //           boxShadow: [
-                                //             isLightTheme
-                                //                 ? MyThemes.lightThemeShadow
-                                //                 : MyThemes.darkThemeShadow,
-                                //           ],
-                                //           color: Theme.of(context)
-                                //               .colorScheme
-                                //               .backGroundColor,
-                                //           shape: BoxShape.circle,
-                                //         ),
-                                //         child: ScaleTransition(
-                                //           scale: Tween(begin: 0.7, end: 1.0)
-                                //               .animate(
-                                //             CurvedAnimation(
-                                //                 parent: _pinnedcController,
-                                //                 curve: Curves.easeOut),
-                                //           ),
-                                //           child: Icon(
-                                //             task.pinned == 1
-                                //                 ? Icons.push_pin
-                                //                 : Icons.push_pin_outlined,
-                                //             size: 20,
-                                //             color: task.pinned == 1
-                                //                 ? Colors.blue
-                                //                 : Colors.blue,
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     ),
-                                //     InkWell(
-                                //       splashColor: Colors.transparent,
-                                //       highlightColor: Colors.transparent,
-                                //       onTap: () {
-                                //         setState(() {
-                                //           task.favorite =
-                                //               task.favorite == 1 ? 0 : 1;
-                                //           print(
-                                //               "[DEBUG] Updating favorite status for task ${task.id}: ${task.favorite}");
-                                //           TaskRepo().updateTaskFavorite(
-                                //               id: task.id ?? 0,
-                                //               isFavorite: task.favorite ?? 0);
-                                //         });
-                                //         _controller.reverse().then(
-                                //             (value) => _controller.forward());
-                                //       },
-                                //       child: Container(
-                                //         width: 40.w,
-                                //         height: 30.h,
-                                //         decoration: BoxDecoration(
-                                //           boxShadow: [
-                                //             isLightTheme
-                                //                 ? MyThemes.lightThemeShadow
-                                //                 : MyThemes.darkThemeShadow,
-                                //           ],
-                                //           color: Theme.of(context)
-                                //               .colorScheme
-                                //               .backGroundColor,
-                                //           shape: BoxShape.circle,
-                                //         ),
-                                //         child: ScaleTransition(
-                                //           scale: Tween(begin: 0.7, end: 1.0)
-                                //               .animate(
-                                //             CurvedAnimation(
-                                //                 parent: _controller,
-                                //                 curve: Curves.easeOut),
-                                //           ),
-                                //           child: Icon(
-                                //             task.favorite == 1
-                                //                 ? Icons.favorite
-                                //                 : Icons.favorite_border,
-                                //             size: 20,
-                                //             color: task.favorite == 1
-                                //                 ? Colors.red
-                                //                 : Colors.red,
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     ),
-                                //   ],
-                                // ),
-                              ],
-                            ),
-                            CustomText(
-                              text: task.title ?? 'Untitled',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              size: 24.sp,
-                              color:
-                                  Theme.of(context).colorScheme.textClrChange,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            task.description != null
-                                ? SizedBox(height: 8.h)
-                                : const SizedBox.shrink(),
-                            task.description != null
-                                ? SizedBox(
-                                    width: double.infinity,
-                                    child: htmlWidget(
-                                        task.description!, context,
-                                        width: 290.w, height: 36.h),
-                                  )
-                                : const SizedBox.shrink(),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 10.h),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.h),
-                  child: statusClientRow(task.status ?? 'Unknown',
-                      task.priority, context, isLightTheme),
-                ),
-                (task.users?.isEmpty ?? true) && (task.clients?.isEmpty ?? true)
-                    ? const SizedBox.shrink()
-                    : Padding(
-                        padding:
-                            EdgeInsets.only(top: 10.h, left: 18.w, right: 18.w),
-                        child: SizedBox(
-                          height: 60.h,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    print(
-                                        "[DEBUG] Showing user dialog for task ${task.id}");
-                                    userClientDialog(
-                                      from: "user",
-                                      context: context,
-                                      title: AppLocalizations.of(context)!
-                                          .allusers,
-                                      list: task.users ?? [],
-                                    );
-                                  },
-                                  child: RowDashboard(
-                                      list: task.users ?? [], title: "user"),
-                                ),
-                              ),
-                              task.users?.isEmpty ?? true
-                                  ? const SizedBox.shrink()
-                                  : SizedBox(width: 20.w),
-                              task.clients?.isEmpty ?? true
-                                  ? const SizedBox.shrink()
-                                  : Expanded(
-                                      child: InkWell(
-                                        onTap: () {
-                                          print(
-                                              "[DEBUG] Showing client dialog for task ${task.id}");
-                                          userClientDialog(
-                                            from: 'client',
-                                            context: context,
-                                            title: task.clients?.isNotEmpty ??
-                                                    false
-                                                ? AppLocalizations.of(context)!
-                                                    .allclients
-                                                : AppLocalizations.of(context)!
-                                                    .allclients,
-                                            list: task.clients ?? [],
-                                          );
-                                        },
-                                        child: RowDashboard(
-                                            list: task.clients ?? [],
-                                            title: "client"),
-                                      ),
-                                    ),
-                            ],
-                          ),
-                        ),
-                      ),
-                Divider(color: Theme.of(context).colorScheme.dividerClrChange),
-                Padding(
-                  padding:
-                      EdgeInsets.only(bottom: 10.h, left: 20.h, right: 20.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          const HeroIcon(HeroIcons.calendar,
-                              style: HeroIconStyle.solid,
-                              color: AppColors.blueColor),
-                          SizedBox(width: 20.w),
-                          CustomText(
-                              text: date ?? "",
-                              color: AppColors.greyColor,
-                              size: 12,
-                              fontWeight: FontWeight.w500),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _taskBlocList(bool isLightTheme) {
+   Widget _taskBlocList(bool isLightTheme) {
     return Expanded(
       child: RefreshIndicator(
         color: AppColors.primary,
@@ -995,282 +1171,7 @@ class _AllTaskScreenState extends State<AllTaskScreen>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final themeBloc = context.read<ThemeBloc>();
-    final currentTheme = themeBloc.currentThemeState;
-    bool isLightTheme = currentTheme is LightThemeState;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: isExpand ? _drawerIn() : _expandedDrawer(),
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(40.h),
-        child: AppBar(
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarColor: isLightTheme ? Colors.transparent : Colors.black,
-            statusBarIconBrightness:
-                isLightTheme ? Brightness.dark : Brightness.light,
-            statusBarBrightness:
-                isLightTheme ? Brightness.light : Brightness.dark,
-          ),
-          backgroundColor: Colors.transparent,
-          leadingWidth: 50.w,
-          leading: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 0.w),
-            child: GestureDetector(
-              onTap: () => _scaffoldKey.currentState?.openDrawer(),
-              child: SizedBox(
-                width: 50.w,
-                height: 30.h,
-                child: HeroIcon(
-                  HeroIcons.bars3BottomLeft,
-                  style: HeroIconStyle.outline,
-                  size: 20.sp,
-                  color: Theme.of(context).colorScheme.textClrChange,
-                ),
-              ),
-            ),
-          ),
-          actions: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 18.w),
-              child: Row(
-                children: [
-                  Stack(
-                    children: [
-                      GestureDetector(
-                        onTap: () => router.push("/notification"),
-                        child: SizedBox(
-                          height: 50.h,
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 5.w, right: 10.w),
-                            child: HeroIcon(
-                              HeroIcons.bell,
-                              style: HeroIconStyle.outline,
-                              size: 20.sp,
-                              color:
-                                  Theme.of(context).colorScheme.textClrChange,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        right: 5.w,
-                        top: 2.h,
-                        child:
-                            BlocConsumer<NotificationBloc, NotificationsState>(
-                          listener: (context, state) {
-                            if (state is NotificationPaginated) {}
-                          },
-                          builder: (context, state) {
-                            print(
-                                "[DEBUG] Notification state: $state, totalUnreadCount: ${context.read<NotificationBloc>().totalUnreadCount}");
-                            if (state is UnreadNotification) {
-                              return state.total == 0
-                                  ? const SizedBox()
-                                  : Container(
-                                      height: 15.sp,
-                                      width: 15.sp,
-                                      decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.yellow.shade800),
-                                      child: Center(
-                                        child: CustomText(
-                                          size: 10,
-                                          fontWeight: FontWeight.w600,
-                                          text: state.total.toString(),
-                                          color: AppColors.pureWhiteColor,
-                                        ),
-                                      ),
-                                    );
-                            }
-                            return const SizedBox();
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  GestureDetector(
-                    onTap: () => _showLanguageDialog(context),
-                    child: SizedBox(
-                      height: 50.h,
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 5.w, right: 5.w),
-                        child: HeroIcon(
-                          HeroIcons.language,
-                          style: HeroIconStyle.outline,
-                          size: 20.sp,
-                          color: Theme.of(context).colorScheme.textClrChange,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: role == 'admin'
-          ? Padding(
-              padding: EdgeInsets.only(bottom: 60.h),
-              child: FloatingActionButton(
-                isExtended: true,
-                onPressed: () {
-                  print("[DEBUG] FAB tapped, navigating to /createtask");
-                  BlocProvider.of<UserBloc>(context).add(UserList());
-                  BlocProvider.of<StatusBloc>(context).add(StatusList());
-                  router.push('/createtask', extra: {
-                    "id": 0,
-                    "isCreate": true,
-                    "title": "",
-                    "desc": "",
-                    "start": "",
-                    "end": "",
-                    "users": <String>[], // Empty list of usernames
-                    "usersid": <int>[], // Empty list of user IDs
-                    "priorityId": 0,
-                    "statusId": 0,
-                    "note": "",
-                    "project": "",
-                    "userList": <dynamic>[], // Empty list for user objects
-                    "status": "",
-                    "req":
-                        <CreateTaskModel>[], // Placeholder, assumed to be defined
-                  });
-                },
-                backgroundColor: AppColors.primary,
-                child: const Icon(Icons.add, color: AppColors.whiteColor),
-              ),
-            )
-          : const SizedBox(),
-      backgroundColor: Theme.of(context).colorScheme.backGroundColor,
-      body: Column(
-        children: [
-          SizedBox(height: 20.h),
-          CustomSearchField(
-            isLightTheme: isLightTheme,
-            controller: searchController,
-            suffixIcon: SizedBox(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (searchController.text.isNotEmpty)
-                    SizedBox(
-                      width: 20.w,
-                      child: IconButton(
-                        highlightColor: Colors.transparent,
-                        padding: EdgeInsets.zero,
-                        icon: Icon(
-                          Icons.clear,
-                          size: 20.sp,
-                          color: Theme.of(context).colorScheme.textFieldColor,
-                        ),
-                        onPressed: () {
-                          searchController.clear();
-                          context.read<TaskBloc>().add(SearchTasks(""));
-                        },
-                      ),
-                    ),
-                  SizedBox(
-                    width: 30.w,
-                    child: IconButton(
-                      icon: Icon(
-                        _speechToText.isNotListening
-                            ? Icons.mic_off
-                            : Icons.mic,
-                        size: 20.sp,
-                        color: Theme.of(context).colorScheme.textFieldColor,
-                      ),
-                      onPressed: () {
-                        if (_speechToText.isNotListening) {
-                          _startListening();
-                        } else {
-                          _stopListening();
-                        }
-                      },
-                    ),
-                  ),
-                  BlocBuilder<TaskFilterCountBloc, TaskFilterCountState>(
-                    builder: (context, state) {
-                      return SizedBox(
-                        width: 35.w,
-                        child: Stack(
-                          children: [
-                            IconButton(
-                              icon: HeroIcon(
-                                HeroIcons.adjustmentsHorizontal,
-                                style: HeroIconStyle.solid,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .textFieldColor,
-                                size: 30.sp,
-                              ),
-                              onPressed: () {
-                                BlocProvider.of<ClientBloc>(context)
-                                    .add(ClientList());
-                                BlocProvider.of<StatusMultiBloc>(context)
-                                    .add(StatusMultiList());
-                                BlocProvider.of<PriorityMultiBloc>(context)
-                                    .add(PriorityMultiList());
-                                BlocProvider.of<ProjectMultiBloc>(context)
-                                    .add(ProjectMultiList());
-                                BlocProvider.of<UserBloc>(context)
-                                    .add(UserList());
-                                _filterDialog(context, isLightTheme);
-                              },
-                            ),
-                            if (state.count > 0)
-                              Positioned(
-                                right: 5.w,
-                                top: 7.h,
-                                child: Container(
-                                  padding: EdgeInsets.zero,
-                                  alignment: Alignment.center,
-                                  height: 12.h,
-                                  width: 10.w,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.primary,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: CustomText(
-                                    text: state.count.toString(),
-                                    color: Colors.white,
-                                    size: 6,
-                                    textAlign: TextAlign.center,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            onChanged: (value) {
-              searchword = value;
-              context.read<TaskBloc>().add(SearchTasks(value));
-            },
-          ),
-          SizedBox(height: 20.h),
-          _taskBlocList(isLightTheme),
-          SizedBox(height: 60.h),
-        ],
-      ),
-    );
-  }
-
-  void soundLevelListener(double level) {
-    minSoundLevel = min(minSoundLevel, level);
-    maxSoundLevel = max(maxSoundLevel, level);
-    setState(() {
-      this.level = level;
-    });
-  }
 
   void _filterDialog(BuildContext context, isLightTheme) {
     showModalBottomSheet(

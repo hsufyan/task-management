@@ -82,7 +82,7 @@ class UpdateTask extends TaskEvent {
 final int id;
   final String title;
   final int statusId;
-  final int priorityId;
+  // final int priorityId;
   final String startDate;
   final String dueDate;
   final String desc;
@@ -94,7 +94,7 @@ final int id;
         required this.id,
         required this.title,
         required this.statusId,
-        required this.priorityId,
+        // required this.priorityId,
         required this.startDate,
         required this.dueDate,
         required this.desc,
@@ -105,7 +105,7 @@ final int id;
     id,
     title,
     statusId,
-    priorityId,
+    // priorityId,
     startDate,
     dueDate,
     desc,

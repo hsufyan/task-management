@@ -217,7 +217,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
                   context.read<PermissionsBloc>().isdeleteUser == true ||
                           context.read<PermissionsBloc>().iseditUser == true
                       ? detailMenu(
-                      isDiscuss:false,
+                   //   isDiscuss:false,
                          isEdit:  context.read<PermissionsBloc>().iseditUser,
                          isDelete: context.read<PermissionsBloc>().isdeleteUser,
                         key:   _key,

@@ -1,0 +1,2 @@
+/Users/maacbookpro/Documents/GitHub/taskify/android/app/.cxx/RelWithDebInfo/11251r1s/x86_64/CMakeFiles/edit_cache.dir
+/Users/maacbookpro/Documents/GitHub/taskify/android/app/.cxx/RelWithDebInfo/11251r1s/x86_64/CMakeFiles/rebuild_cache.dir

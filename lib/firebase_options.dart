@@ -50,19 +50,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBpqwaC6SGUCrS6oUNAYjIpny9w1RqcY8g',
-    appId: '1:824465947205:android:6cff3b38069296f831c12c',
-    messagingSenderId: '824465947205',
-    projectId: 'taskiiiiiify',
-    storageBucket: 'taskiiiiiify.firebasestorage.app',
+    apiKey: 'AIzaSyB2BJlSzMy8fbgWGSxbwV9o0IF9r6SUI3s',
+    appId: '1:432472844941:android:cc38a2d55d7ce95fdb10c4',
+    messagingSenderId: '432472844941',
+    projectId: 'taskify-49fca',
+    storageBucket: 'taskify-49fca.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCbqBSKrsXCzyb9WOJMEP10Wh2hE4hvXNo',
-    appId: '1:824465947205:ios:cd1b94cd672f332331c12c',
-    messagingSenderId: '824465947205',
-    projectId: 'taskiiiiiify',
-    storageBucket: 'taskiiiiiify.firebasestorage.app',
+    apiKey: 'AIzaSyD08N5lSuNQis03rILU8yWhrP-hNW1oaNg',
+    appId: '1:432472844941:ios:3e7a3e3e961fea72db10c4',
+    messagingSenderId: '432472844941',
+    projectId: 'taskify-49fca',
+    storageBucket: 'taskify-49fca.firebasestorage.app',
     iosBundleId: 'com.example.taskify',
   );
 }

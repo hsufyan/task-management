@@ -364,15 +364,14 @@ final router = GoRouter(
       path: '/taskdetail',
       builder: (context, state) {
         final Map<String, dynamic> data = state.extra as Map<String, dynamic>;
-
         final bool fromNoti = data['fromNoti'] as bool? ?? false;
-        final String from = data['from'] as String? ?? "";
-        final int id = data['id'] as int? ?? 0;
+        final String from = data['from'] as String? ?? '';
+        final Tasks? task = data['task'] as Tasks?;
 
         return TaskDetailScreen(
           fromNoti: fromNoti,
           from: from,
-          id: id,
+          task: task,
         );
       },
     ),

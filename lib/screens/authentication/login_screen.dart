@@ -65,15 +65,20 @@ class _LoginScreenState extends State<LoginScreen> {
     return false;
   }
 
-  void _getFCMToken() async {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-    String? token = await messaging.getToken();
-    setState(() {
-      fcmToken = token;
-    });
-    await HiveStorage.setFcm(token!);
-    AuthRepository().getFcmId(fcmId:token);
-  }
+void _getFCMToken() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  String? token = await messaging.getToken();
+
+  print("FCM Token: $token"); // 👈 Print it in debug console
+
+  setState(() {
+    fcmToken = token;
+  });
+
+  await HiveStorage.setFcm(token!);
+  AuthRepository().getFcmId(fcmId: token);
+}
+
 
   void validateAndSubmit() async {
 

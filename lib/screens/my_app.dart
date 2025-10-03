@@ -1,4 +1,5 @@
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -91,11 +92,25 @@ class _MyAppState extends State<MyApp> {
       FlutterLocalNotificationsPlugin();
   String? fcmToken;
 
+  void _getFCMToken() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  String? token = await messaging.getToken();
+
+  print("FCM Token: $token"); // 👈 Print it in debug console
+
+  setState(() {
+    fcmToken = token;
+  });
+
+  
+}
+
 
   @override
   void initState() {
     super.initState();
     _initializeNotification();
+    _getFCMToken();
     ThemeBloc.loadTheme().then((value) {
     setState(() {
       isDarkTheme = value;
